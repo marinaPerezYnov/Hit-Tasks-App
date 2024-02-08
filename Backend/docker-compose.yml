@@ -7,49 +7,49 @@ services:
     volumes:
       - "./api:/usr/share/nginx/html:ro"
       - "./.docker/nginx/log:/var/log/nginx"
-      - "./.docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro"
+      - "./.docker/nginx/:/etc/nginx/:ro"
     ports:
       - "80:80"
 
-  web-reservations-php:
+  hit-tasks-php:
     build: 
       context: .docker
       dockerfile: ./php/Dockerfile
-    container_name: web-reservations-php
+    container_name: hit-tasks-php
+    # restart: always
     working_dir: /usr/share/nginx/html
-    dns :
-      - 172.20.16.200 
-      - 8.8.8.8
-      - 8.8.4.4
-      
+    depends_on:
+      - database
+    environment:
+      MYSQL_HOST: database
+      MYSQL_PORT: 3306
+      MYSQL_USER: example_user
+      MYSQL_PASSWORD: root
+      MYSQL_DATABASE: example_db
     volumes:
       - "./api:/usr/share/nginx/html"
     command:
       - /bin/sh
       - -c
       - |
-        dockerize -wait tcp://database:3306 -timeout 120s -wait-retry-interval 5s -- make -C /usr/share/nginx/html start-local
+        dockerize -wait tcp://database:3306 -timeout 120s -wait-retry-interval 5s
 
   database:
     image: mariadb:10.5.12
-    env_file:
-      - ./.docker/mariadb/.env.dev
+    # env_file:
+    #   - ./.docker/mariadb/.env.dev
     ports:
       - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: example_root_password
+      MYSQL_USER: example_user
+      MYSQL_PASSWORD: root
+      MYSQL_DATABASE: example_db
     volumes:
       - db_data:/var/lib/mysql
-      # you may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
-      # - .docker/mariadb/data:/var/lib/mysql:rw
-
-#  maildev:
-#    image: maildev/maildev
-#    container_name: web-mail
-#    ports:
-#      - "1080:80"
 
   adminer:
     image: adminer
-    #    restart: always
     ports:
       - "8080:8080"
 
