@@ -1,5 +1,8 @@
+/* MUI */
 import { Button } from "@mui/material";
-import Form from "../Components/form/form";
+
+/* UTILS */
+import { Form } from "../Components/form/form";
 
 export const Register = () => {
   const registerToAccount = () => {
@@ -17,11 +20,16 @@ export const Register = () => {
   };
 
   return (
-    <div>
-      <h1>Register</h1>
+    <div className="registerForm">
+      <h3>Register</h3>
       <Form />
-      <Button variant="contained" onClick={registerToAccount}>
-        Login
+      <Button  sx={{
+        margin: "2%",
+        backgroundColor: "black",
+        color: "wheat",
+        fontSize: "unset"
+      }} onClick={registerToAccount}>
+        Register
       </Button>
     </div>
   );
