@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import { HomePage } from "./Pages/HomePage";
@@ -11,8 +11,17 @@ import "./App.css";
 import Header from "./Components/header/header";
 import { Footer } from "./Components/footer/footer";
 
-class App extends Component {
-  render() {
+function App() {
+    // const [isAuth, setIsAuth] = useState(false);
+
+    // useEffect(() => {
+    //   if (sessionStorage.getItem("token")) {
+    //     setIsAuth(true);
+    //     console.log("isAuth", isAuth);
+    //     console.log("token", sessionStorage.getItem("token"));
+    //   }
+    // });
+
     return (
       <Router>
         <div className="App">
@@ -21,15 +30,14 @@ class App extends Component {
             <Routes>
               <Route exact path="/" element={<HomePage />}></Route>
               <Route exact path="/history" element={<History />}></Route>
+              <Route exact path="/listTasks" element={<ListTasks />}></Route>
               <Route exact path="/login" element={<Login />}></Route>
               <Route exact path="/register" element={<Register />}></Route>
-              <Route exact path="/listTasks" element={<ListTasks />}></Route>
             </Routes>
           </div>
           <Footer></Footer>
         </div>
       </Router>
     );
-  }
 }
 export default App;

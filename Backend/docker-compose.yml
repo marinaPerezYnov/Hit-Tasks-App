@@ -1,57 +1,59 @@
-version: "3.4"
-
+version: '3.0'
+# version: '3.7'
 services:
+  # NGINX Service
   web-nginx:
     image: nginx:stable-alpine
+    # container_name: web-nginx-forum
     working_dir: /usr/share/nginx/html
     volumes:
-      - "./api:/usr/share/nginx/html:ro"
+      #volume stockant les fichiers web du projet
+      - "./apiFolder:/usr/share/nginx/html:ro"
       - "./.docker/nginx/log:/var/log/nginx"
-      - "./.docker/nginx/:/etc/nginx/:ro"
+      - "./.docker/nginx/nginx.conf/:/etc/nginx/nginx.conf/:ro"
     ports:
-      - "80:80"
-
-  hit-tasks-php:
-    build: 
-      context: .docker
-      dockerfile: ./php/Dockerfile
-    container_name: hit-tasks-php
-    # restart: always
+    #local: container
+      - "8081:80"
+    # depends_on:
+    #   - db
+    # links:
+    # #lien vers le conteneur db
+    #   - db:db
+  # PHP Service
+  web-api-tasks-php-bloc:
+    #build: .docker/php
+    #container_name: web-forum-php
+    build:
+      context: .
+      dockerfile: ./.docker/php/Dockerfile
+    # container_name: web-forum-php-bloc
     working_dir: /usr/share/nginx/html
-    depends_on:
-      - database
-    environment:
-      MYSQL_HOST: database
-      MYSQL_PORT: 3306
-      MYSQL_USER: example_user
-      MYSQL_PASSWORD: root
-      MYSQL_DATABASE: example_db
+    # dns :
+    #   - 127.0.0.1
     volumes:
-      - "./api:/usr/share/nginx/html"
+      - "./apiFolder:/usr/share/nginx/html"
     command:
       - /bin/sh
       - -c
       - |
-        dockerize -wait tcp://database:3306 -timeout 120s -wait-retry-interval 5s
-
+         composer update --prefer-dist --no-progress & php-fpm
+    #        pwd
+    #        make -C /usr/share/nginx/html/ start-local
+    #        cd /usr/share/nginx/html -- composer update --prefer-dist --no-progress  
   database:
-    image: mariadb:10.5.12
-    # env_file:
-    #   - ./.docker/mariadb/.env.dev
+    image: 'mariadb:10.5.12'
+    env_file:
+      - ./.docker/mariadb/.env.dev
     ports:
       - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: example_root_password
-      MYSQL_USER: example_user
-      MYSQL_PASSWORD: root
-      MYSQL_DATABASE: example_db
-    volumes:
-      - db_data:/var/lib/mysql
-
   adminer:
     image: adminer
+    #    restart: always
     ports:
-      - "8080:8080"
+      - 8080:8080
 
 volumes:
   db_data: {}
+
+# Start containers with docker-compose up -d
+# Go into the php container with docker-compose exec php bash

@@ -1,3 +1,12 @@
+.formToAddTask {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 2% auto;
+    flex-direction: column;
+}
+
 .button {
     display: flex;
     align-items: center;
@@ -27,6 +36,7 @@
     font-size: 1.5rem;
     background-color: #5d0b0b;
     padding: 5px;
+    min-inline-size: max-content;
 }
 
 .description {

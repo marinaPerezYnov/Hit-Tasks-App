@@ -1,7 +1,7 @@
 /* UTILS */
 import RandomValueWeek from "./../Components/randomValueWeek/randomValueWeek";
-
 import "./styles/home.css";
+
 export const HomePage = () => {
   return (
     <div className="container">
