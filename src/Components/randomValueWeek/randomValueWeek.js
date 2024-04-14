@@ -13,18 +13,18 @@ export default function RandomValueWeek() {
         //TODO : Générer une valeur aléatoire comprise entre 30 et 100 qui ne peux être qu'un divisible de 10
         setValueWeek(Math.floor(Math.random() * 8 + 3) * 10);
 
-        console.log("valueWeek", JSON.stringify({ value: valueWeek, userId: sessionStorage.getItem("userId") }));
-
         fetch("http://localhost:8081/addValueTasksWeek", {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
                 "authorization": "Bearer " + sessionStorage.getItem("token")
             },
-            body: JSON.stringify({ value: Math.floor(Math.random() * 8 + 3) * 10, userId: sessionStorage.getItem("userId") }),
+            body: JSON.stringify({ weekValue: Math.floor(Math.random() * 8 + 3) * 10, userId: sessionStorage.getItem("userId") }),
         })
         .then((response) => response.json())
-        .then((data) => console.log("data : ", data))
+        .then((data) => {
+            console.log("data : ", data)
+        })
         .catch((error) => console.log("error", error));
     };
     

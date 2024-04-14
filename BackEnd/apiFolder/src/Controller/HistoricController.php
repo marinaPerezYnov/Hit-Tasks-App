@@ -23,6 +23,7 @@ class HistoricController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         $historic = new Historic();
+        $historic->setTaskId($data['taskId']);
         $historic->setDate($data['date']);
         $historic->setValueTasksCompleted($data['valueTasksCompleted']);
         $historic->setUserId($data['userId']);
@@ -42,8 +43,10 @@ class HistoricController extends AbstractController
     {
         $userId = $request->query->get('userId');
         $date = $request->query->get('date');
-
-        $allHistoric = $this->doctrine->getRepository(Historic::class)->findBy(['date' => $date, 'userId' => $userId]);
+        //transformer la date au format YYYY-MM
+        $formatDate = date('Y-m', strtotime($date));
+        $allHistoric = $this->doctrine->getRepository(Historic::class)->findBy(['userId' => $userId]);
+        // $allHistoric = $this->doctrine->getRepository(Historic::class)->findBy(['date' => $formatDate, 'userId' => $userId]);
 
         return $this->json(
             (object)[

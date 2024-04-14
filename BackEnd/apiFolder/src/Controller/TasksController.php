@@ -3,6 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Tasks;
+use App\Entity\Historic;
+use App\Repository\TasksRepository;
+use App\Repository\HistoricRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -18,13 +21,14 @@ class TasksController extends AbstractController
     #[Route(path: '/addTasks', name: 'app_add_tasks', methods: ['GET','POST'])]
     public function addTasks(Request $request): Response
     {
-        // http://localhost:8081/addTasks
         $data = json_decode($request->getContent(), true);
         $tasks = new Tasks();
         $tasks->setName($data['name']);
         $tasks->setTaskValue($data['taskValue']);
         $tasks->setUserId($data['userId']);
-        print_r($tasks);
+        $tasks->setDate($data['date']);
+        $tasks->setTime($data['time']);
+        
         $entityManager = $this->doctrine->getManager();
         $entityManager->persist($tasks);
         $entityManager->flush();
@@ -47,6 +51,23 @@ class TasksController extends AbstractController
             ]
         );
     }
+    // Fonction pour définir au changement de status un nouvelle valeur de status récupérée depuis le front et qui va être enregistrée dans la base de données
+
+    #[Route(path: '/updateStatusTasks', name: 'app_update_status_tasks', methods: ['PUT'])]
+    public function updateStatusTasks(Request $request): Response
+    {
+        $data = json_decode($request->getContent(), true);
+        $updateStatusTasks = $this->doctrine->getRepository(Tasks::class)->findOneBy(['id' => $data['id']]);
+        $updateStatusTasks->setStatus($data['status']);
+        $entityManager = $this->doctrine->getManager();
+        $entityManager->persist($updateStatusTasks);
+        $entityManager->flush();
+        return $this->json(
+            (object)[
+                'data' => $updateStatusTasks,
+            ]
+        );
+    }
 
     #[Route(path: '/deleteOneTasks', name: 'app_delete_one_tasks', methods: ['DELETE'])]
     public function deleteOneTasks(Request $request): Response
@@ -54,12 +75,14 @@ class TasksController extends AbstractController
         //TODO: Implémenter une fonction qui va permettre de supprimer un post
 
         $data = json_decode($request->getContent(), true);
-        
+        //on récupére dans la table Historic le post qui a le même id que celui récupéré et on le supprime
+        $deleteHistoric = $this->doctrine->getRepository(Historic::class)->findOneBy(['taskId' => $data]);
+
         //on récupére le post qui a le même id que celui récupéré 
         $deleteTasks = $this->doctrine->getRepository(Tasks::class)->findOneBy(['id' => $data]);
 
         $em = $this->doctrine->getManager();
-
+        $em->remove($deleteHistoric);
         $em->remove($deleteTasks);
         $em->flush();
         return $this->json(

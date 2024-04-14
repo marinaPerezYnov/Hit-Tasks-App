@@ -10,3 +10,8 @@ framework:
 #     framework:
 #         router:
 #             strict_requirements: null
+
+refresh_token:
+    path: /api/token/refresh
+    methods: [POST]
+    controller: App\Controller\SecurityController::refreshToken

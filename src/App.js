@@ -6,22 +6,13 @@ import { History } from "./Pages/History";
 import { Login } from "./Pages/Login";
 import { Register } from "./Pages/Register";
 import { ListTasks } from "./Pages/ListTasks";
-
+import { Calendar } from "./Pages/Calendar";
+import { Trello } from "./Pages/Trello";
 import "./App.css";
 import Header from "./Components/header/header";
 import { Footer } from "./Components/footer/footer";
 
 function App() {
-    // const [isAuth, setIsAuth] = useState(false);
-
-    // useEffect(() => {
-    //   if (sessionStorage.getItem("token")) {
-    //     setIsAuth(true);
-    //     console.log("isAuth", isAuth);
-    //     console.log("token", sessionStorage.getItem("token"));
-    //   }
-    // });
-
     return (
       <Router>
         <div className="App">
@@ -31,6 +22,7 @@ function App() {
               <Route exact path="/" element={<HomePage />}></Route>
               <Route exact path="/history" element={<History />}></Route>
               <Route exact path="/listTasks" element={<ListTasks />}></Route>
+              <Route exact path="/tasksOrganisators" element={<Trello />}></Route>
               <Route exact path="/login" element={<Login />}></Route>
               <Route exact path="/register" element={<Register />}></Route>
             </Routes>

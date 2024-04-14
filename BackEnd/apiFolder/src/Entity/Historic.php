@@ -20,6 +20,8 @@ class Historic
     #[ORM\Column(type: 'integer', nullable: true)]
     private $userId;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $taskId;
     /**
      * @ORM\Column(type="text", nullable=true)
      */
@@ -35,6 +37,17 @@ class Historic
     public function getId(): ?int
     {
         return $this->id;
+    }
+    public function setTaskId(?int $taskId): self
+    {
+        $this->taskId = $taskId;
+
+        return $this;
+    }
+    
+    public function getTaskId(): ?int
+    {
+        return $this->taskId;
     }
 
     public function getUserId(): ?int

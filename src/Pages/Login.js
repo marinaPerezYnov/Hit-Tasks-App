@@ -3,18 +3,17 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 /* MUI */
 import { Button } from "@mui/material";
-
+import LinearBuffer from "./../Components/loader/loader";
 /* UTILS */
 import { Form } from "../Components/form/form";
 
 export const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showLoader, setShowLoader] = useState(false);
   const navigate = useNavigate();
   const loginToAccount = () => {
-    console.log("email", email);
-    console.log("password", password);
-
+    setShowLoader(true);
     // Fonctionnalité de transmission de données email et password au back pour sa connexion
     fetch("http://localhost:8081/login", {
       method: "POST",
@@ -25,13 +24,12 @@ export const Login = () => {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log("data");
-        console.log(data);
         // J'enregistre le token dans le sessionStorage pour le conserver
         // Modifier son stockage pour une meilleure sécurité
         sessionStorage.setItem("token", data.token);
         sessionStorage.setItem("userId", data.userId);
-        navigate("/");
+        setShowLoader(false);
+        return navigate("/");
       })
       .catch((error) => console.log("error", error));
   };
@@ -50,6 +48,7 @@ export const Login = () => {
       <Button sx={styles.button} onClick={loginToAccount}>
         Login
       </Button>
+      {showLoader && <LinearBuffer />}
     </div>
   );
 };

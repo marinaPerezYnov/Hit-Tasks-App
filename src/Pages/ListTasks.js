@@ -6,32 +6,37 @@ import { Button } from "@mui/material";
 import { TextField } from "@mui/material";
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
+import Tooltip from '@mui/material/Tooltip';
+import Modal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import LinearBuffer from "./../Components/loader/loader";
+
+import dayjs from "dayjs";
+import Grid from "@mui/material/Grid";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 
 /* UTILS */
 import "./styles/list.css";
+import { useNavigate } from "react-router-dom";
+import { Calendar } from "./Calendar";
 
 export const ListTasks = () => {
   const [listTasks, setListTasks] = useState([]);
   const [newTask, setNewTask] = useState({ name: "", value: 0 });
-  
-  // Fonctionnalité d'ajout de tâche et de pourcentage est fonctionnelle 
-  const addNewTask = () => {
-    console.log(JSON.stringify({ name: newTask.name, taskValue: newTask.value, userId: sessionStorage.getItem("userId") }))
-    fetch("http://localhost:8081/addTasks", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + sessionStorage.getItem("token")
-      },
-      body: JSON.stringify({ name: newTask.name, taskValue: newTask.value, userId: sessionStorage.getItem("userId") }),
-    })
-    .then((response) => response.json())
-    .then((data) => {
-      getTasks(); // Actualiser la liste des tâches après l'ajout
-    })
-    .catch((error) => console.log("Error adding new task", error));
-  };
+  const [showLoader, setShowLoader] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [addNewestTask, setAddNewTask] = useState({ name: "", taskValue: 0, userId: sessionStorage.getItem("userId"), date: "", time: "" });
+  const today = dayjs();
 
+  const [currentTasks, setCurrentTasks] = useState([]);
+  const handleOpen = () => setOpen(true);
+
+  const handleClose = () => setOpen(false);
+
+  const navigate = useNavigate();
   // Fonctionnalité de récupération des tâches est fonctionnelle
   const getTasks = () => {
     fetch(`http://localhost:8081/getAllTasks/${sessionStorage.getItem("userId")}`, {
@@ -48,45 +53,64 @@ export const ListTasks = () => {
       return response.json();
     })
     .then((data) => {
+      //ajouter une propriété isFinish à chaque objets de data.data
+      data.data.forEach((item) => {
+        item.isFinish = false;
+      });
       return setListTasks(data.data);
     })
     .catch((error) => console.log("Error retrieving tasks", error));
+    return navigate("/listTasks");
   };
 
   //Fonctionnalité permettant d'enregistrer en base de données les pourcentages effectués des tâches
-  const saveTasks = ({task}) => {
-
-    const currentDate = new Date();
-    const year = currentDate.getFullYear();
-    // Les mois sont indexés à partir de 0, donc ajoutez 1 pour obtenir le mois réel
-    const month = currentDate.getMonth() + 1;
-    
-    // Formattez la date au format YYYY-MM
-    const formattedDate = `${year}-${month.toString().padStart(2, '0')}`;
-
-    const valueTasksCompleted = task.taskValue;
-
-    fetch("http://localhost:8081/addHistoric", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + sessionStorage.getItem("token")
-      },
-      body: JSON.stringify({ date: formattedDate, valueTasksCompleted: valueTasksCompleted, userId: sessionStorage.getItem("userId") }),
-    })
-    .then((response) => response.json())
-    .then((data) => {
-      console.log("data : ", data);
-    })
-    .catch((error) => console.log("error", error));
-  };
-
   useEffect(() => {
     getTasks();
+    setShowLoader(true);
+    // Obtenez la date actuelle
+    const currentDate = new Date();
+    // Récupérez l'année et le mois
+    const year = currentDate.getFullYear();
+    // Les mois sont indexés à partir de 0, donc ajoutez 1 pour obtenir le mois réel
+    const month = (currentDate.getMonth() + 1);
+    
+    fetch(`http://localhost:8081/getAllHistoric?userId=${sessionStorage.getItem("userId")}&date=${year}-${month.toString().padStart(2, '0')}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "authorization": "Bearer " + sessionStorage.getItem("token")
+      }
+    })
+    .then(response => {
+      // Vérifiez le statut de la réponse
+      if (!response.ok) {
+        throw new Error('Erreur réseau ou serveur: ' + response.status);
+      }
+      // Parse la réponse JSON
+      return response.json();
+    })
+    .then((data) => {
+      // On va boucler sur le tableau de données et si l'id de la tâche correspnd à l'id de listTask, alors on va modifier le style de la tâche
+      data.data.forEach((item) => {
+        listTasks.forEach((task) => {
+          if (item.taskId === task.id) {
+            task.isFinish = true;
+
+            return setListTasks([...listTasks]);
+          }
+        });
+      });
+      setShowLoader(false);
+    })
+    .catch((error) => console.log("error", error));
   }, []);
+
 
   //Fonctonnalité de suppression de tâche est fonctionnelle
   const deleteTask = (taskId) => {
+
+    // Fermer la pop up après le click sur oui/non
+    setShowLoader(true);
     // Créé une requête qui permettra de supprimer une tâche en fonction de son id en tenant compte de la fonction ci-dessus
     fetch(`http://localhost:8081/deleteOneTasks`, {
       method: "DELETE",
@@ -98,31 +122,34 @@ export const ListTasks = () => {
     })
     .then((response) => response.json())
     .then((data) => {
-      getTasks(); // Actualiser la liste des tâches après la suppression
+      getTasks();
+      window.location.reload();
+      navigate("/listTasks");
+      setShowLoader(false);
+      // setToDelete(false)
+      handleClose();
     })
     .catch((error) => console.log("error", error));
   };
 
+  
   return (
     <div>
       <h3 className="title">ListTasks</h3>
-      <div className="formToAddTask">
-        <div style={{width:"40%"}}>
-          <TextField id="outlined-basic" sx={{width: "80%"}} type="text" label="Task" variant="outlined" onChange={(e) => {return setNewTask({ ...newTask, name: e.target.value })}} />
-          <TextField id="outlined-basic" sx={{width: "20%"}} type="number" label="Percent" variant="outlined" onChange={(e) => {return setNewTask({ ...newTask, value: e.target.value })}} />
-        </div>
-        <Button sx={{
-          margin: "2%",
-          backgroundColor: "#5d0b0b",
-          color: "white",
-          fontSize: "unset", width: "40%" }} onClick={addNewTask}>
-          Add new task
-        </Button>
+        <Calendar setAddNewTask={setAddNewTask} listTasks={listTasks} setCurrentTasks={setCurrentTasks} currentTasks= {currentTasks}/>
+      <div>
+        {showLoader && <LinearBuffer />}
       </div>
       <ul>
-        {listTasks.map((task) => (
+        {currentTasks.length > 0 ? currentTasks.map((task) => (
           <li key={task.id} className="button">
-            <div className="tasks">
+            <div className="tasks" style={{
+
+              // Si la tâche est terminée, alors on change la couleur de fond en rouge, sinon en bleu
+              backgroundColor: "white",
+              color: task.isFinish ? "green" : "black",
+
+            }}>
               <p className="description">{task.name}</p>
               <div style={{
                     display: "flex",
@@ -134,17 +161,56 @@ export const ListTasks = () => {
                     margin: "2%",
                     color: "#5d0b0b",
                     fontSize: "unset" }} 
-                onClick={() => deleteTask(task.id)}><DeleteForeverIcon sx={{fontSize: "xx-large"}}/></Button>
-                <Button 
-                  sx={{
-                    margin: "2%",
-                    color: "#5d0b0b",
-                    fontSize: "unset" }}
-                onClick={() => saveTasks({task})}><TaskAltIcon sx={{fontSize: "xx-large"}}/></Button>
+                    onClick={() => {
+                      handleOpen();
+                    }}>
+                  <Tooltip title="Delete the task">
+                    <DeleteForeverIcon sx={{fontSize: "xx-large"}}/>
+                  </Tooltip>
+                </Button>
+                    <Modal
+                      open={open}
+                      onClose={handleClose}
+                      aria-labelledby="modal-modal-title"
+                      aria-describedby="modal-modal-description"
+                      sx={{
+                        display: "flex", 
+                        justifyContent: "center", 
+                        alignItems: "center",
+                        width: "50%",
+                        height: "50%",
+                        backgroundColor: "white !important",}}
+                    >
+                      <Box>
+                        <Button sx={{
+                          marginLeft: "100%",
+                          marginBottom: "10%",
+                          backgroundColor: "brown",
+                          color: "white",
+                        }} onClick={handleClose}>X</Button>
+                        <Typography id="modal-modal-title" variant="h6" component="h2">
+                          Voulez vous vraiment supprimer cette tâche?
+                        </Typography>
+                        <Button onClick={() => {
+                          deleteTask(task.id);
+                          handleClose();
+                        }}>
+                          Oui
+                        </Button>
+                        <Button 
+                          onClick={()=>{
+                            handleClose();
+                          }}
+                        >
+                          Non
+                        </Button> 
+                      </Box>
+                    </Modal>
               </div>
             </div>
           </li>
-        ))}
+        )) : <p> No tasks</p>
+        }
       </ul>
     </div>
   );

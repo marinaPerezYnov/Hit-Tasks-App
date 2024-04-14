@@ -32,6 +32,16 @@ class Tasks
     #[ORM\Column(type: 'integer', nullable: true)]
     private $taskValue;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $date;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $time;
+
+    //variable de type integer qui va permettre de définir le status de la tâche où par défaut elle sera à 0 à sa création
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $status = 0;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -69,6 +79,42 @@ class Tasks
     public function setTaskValue(?int $taskValue): self
     {
         $this->taskValue = $taskValue;
+
+        return $this;
+    }
+
+    public function getDate(): ?string
+    {
+        return $this->date;
+    }
+
+    public function setDate(?string $date): self
+    {
+        $this->date = $date;
+
+        return $this;
+    }
+
+    public function getTime(): ?string
+    {
+        return $this->time;
+    }
+
+    public function setTime(?string $time): self
+    {
+        $this->time = $time;
+
+        return $this;
+    }
+
+    public function getStatus(): ?int
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?int $status): self
+    {
+        $this->status = $status;
 
         return $this;
     }

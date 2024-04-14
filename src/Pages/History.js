@@ -6,35 +6,94 @@ import PieChart from "./../Utils/Diagramms/percent";
 import data from "./../Utils/Mocks/History/mocks";
 import "./styles/history.css";
 
+/* DAYJS */
+import dayjs from "dayjs";
+
 /* MUI */
 import { Box } from "@mui/material";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import LinearBuffer from "./../Components/loader/loader";
+import 'dayjs/locale/fr';
+
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import TextField from '@mui/material/TextField';
-
 
 export const History = () => {
   const [history, setHistory] = useState([]);
-  const [date, setDate] = useState(new Date());
+  // dayjs(date)
+  const [date, setDate] = useState(dayjs());
   // const [calendarOpen, setCalendarOpen] = useState(false);
+  const [week, setWeek] = useState(0);
 
+  const [showLoader, setShowLoader] = useState(false);
+
+  const valuesForDatasets = [
+    {
+      value: 0,
+      week: 0
+    },{
+      value: 0,
+      week: 0
+    },{
+      value: 0,
+      week: 0
+    },{
+      value: 0,
+      week: 0
+    }
+  ];
   // Fonction pour ouvrir le calendrier
   // const handleOpenCalendar = () => {
   //   setCalendarOpen(true);
   // };
+  function getWeekNumer(data, id) {
+    data.data.forEach((item) => {
+      const date = new Date(item.date);
+      // je récupére le jour du mois
+      const day = date.getDate();
+      const week = Math.ceil(day / 7);
 
+      // Si les items sont dans la même semaine, additionnez les valeurs item.valueTasksCompleted et enregistrer la somme dans valuesForDatasets
+        switch (week) {
+          case 1:
+            valuesForDatasets[0].week = week;
+            // Si deux éléments sont dans la même semaine, additionnez les valeurs item.valueTasksCompleted et enregistrer la somme dans valuesForDatasets[0].value
+            valuesForDatasets[0].value += Number(item.valueTasksCompleted);
+            break 
+          case 2:
+            valuesForDatasets[1].week = week;
+            // Si deux éléments sont dans la même semaine, additionnez les valeurs item.valueTasksCompleted et enregistrer la somme dans valuesForDatasets[1].value
+            valuesForDatasets[1].value += Number(item.valueTasksCompleted);
+            break 
+          case 3:
+            valuesForDatasets[2].week = week;
+            // Si deux éléments sont dans la même semaine, additionnez les valeurs item.valueTasksCompleted et enregistrer la somme dans valuesForDatasets[2].value
+            valuesForDatasets[2].value += Number(item.valueTasksCompleted);
+            break 
+          case 4:
+            valuesForDatasets[3].week = week;
+            // Si deux éléments sont dans la même semaine, additionnez les valeurs item.valueTasksCompleted et enregistrer la somme dans valuesForDatasets[3].value
+            valuesForDatasets[3].value += Number(item.valueTasksCompleted);
+            break;
+          default:
+            return 0;
+        }
+        // const currentWeekDataset = valuesForDatasets.find(
+        //   (dataset) => dataset.week === week
+        // );
+    
+        // if (currentWeekDataset) {
+        //   currentWeekDataset.value += Number(item.valueTasksCompleted);
+        // }
+    });
+  }
   const getHistory = () => {
     // Obtenez la date actuelle
     const currentDate = new Date(date);
-    console.log("currentDate : ", currentDate);
     // Récupérez l'année et le mois
     const year = currentDate.getFullYear();
-    console.log("year : ", year);
     // Les mois sont indexés à partir de 0, donc ajoutez 1 pour obtenir le mois réel
     const month = (currentDate.getMonth() + 1);
-    console.log("month : ", month);
-    console.log("format date : ", `${year}-${month.toString().padStart(2, '0')}`)
     fetch(`http://localhost:8081/getAllHistoric?userId=${sessionStorage.getItem("userId")}&date=${year}-${month.toString().padStart(2, '0')}`, {
       method: "GET",
       headers: {
@@ -54,14 +113,27 @@ export const History = () => {
       if (data.data.length === 0) {
         return setHistory([]);
       }
-
-      const arrDatasets = data.data.map(item => ({
+      getWeekNumer(data);
+      // si data.data.length est === 0, alors on doit retourner un tableau vide 
+      // si data.data.length est < 4, alors on doit ajouter des objets dans data.data pour que data.data.length soit égal à 4
+      if(data.data.length < 4) {
+        for (let i = data.data.length; i < 4; i++) {
+          data.data.push({
+            id: i,
+            date: `${year}-${month.toString().padStart(2, '0')}`,
+            valueTasksCompleted: 0
+          });
+        }
+      }
+      // récupérer la valeur week retournée par la fonction getWeekNumer et l'associer au label de datasets
+      const arrDatasets = data.data.map((item,index) => (
+        {
         id: parseInt(item.id),
         datasets: [{
-          label: `Dataset ${item.id}`,
-          data: [parseInt(item.valueTasksCompleted), 10, 10, 10, 10, 10],
+          label: `Dataset ${valuesForDatasets[index].week !== 0 ? valuesForDatasets[index].week : null}`,
+          data: [parseInt(valuesForDatasets[index].value), 10, 10, 10, 10, 10],
           backgroundColor: [
-            'red',
+            '#114550',
             'white',
             'white',
             'white',
@@ -71,12 +143,17 @@ export const History = () => {
           hoverOffset: 4
         }]
       }));
+      setShowLoader(false);
+      // Le tableau arrDatasets doit être composé de 4 objets, chaque objet doit contenir un tableau datasets
+      // Chaque tableau datasets doit contenir un objet avec les clés label, data, backgroundColor et hoverOffset
+
       return setHistory([data.data[0].date, arrDatasets]);
     })
     .catch((error) => console.log("error", error));
   };
 
   useEffect(() => {
+    setShowLoader(true);
     getHistory();
   }, [date]);
 
@@ -104,27 +181,20 @@ export const History = () => {
   return (
     <div>
       <h3 className="title">History</h3>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <LocalizationProvider dateAdapter={AdapterDayjs} locale="fr">
       <DatePicker
-        label={date} 
+        label={date.format('YYYY-MM')} 
         views={['month', 'year']} 
+        defaultValue={date}
         value={date}
         onChange={(newDate) => {
           setDate(newDate);
-          // setCalendarOpen(false); // Fermer le calendrier lors de la sélection d'une date
         }}
-        // open={calendarOpen} // Utiliser l'état pour contrôler l'ouverture/fermeture du calendrier
-        // onClose={() => setCalendarOpen(false)} // Fermer le calendrier lorsqu'on clique à l'extérieur
-        // slots={{ day: false, month: true, year: true }}
-        // renderInput={(params) => (
-        //   <TextField
-        //     {...params}
-        //     onClick={handleOpenCalendar} // Ouvrir le calendrier lorsqu'on clique sur le champ de saisie
-        //   />
-        // )}
       />
       </LocalizationProvider>
-
+      <div>
+        {showLoader && <LinearBuffer />}
+      </div>
       <div className="containerBox">
         {history[1] ? 
           history[1].map((data, index) => (

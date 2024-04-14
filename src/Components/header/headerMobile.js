@@ -69,6 +69,7 @@ export default function HeaderMobile() {
                 <Link style={style} to="/login">Login</Link>
                 <Link style={style} to="/register">Register</Link>
                 <Link style={style} to="/listTasks">ListTasks</Link>
+                <Link style={style} to="/tasksOrganisators">Organisateur de temps</Link>
                 <Link style={style} to="/history">Historique</Link>
             </div>
         </MenuItem>

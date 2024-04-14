@@ -24,7 +24,47 @@ class RegistrationController extends AbstractController
 
     function generateToken(User $user): string
     {
-        return $this->jwtManager->create($user);
+        $accessToken = $this->jwtManager->create($user);
+
+        // Generate refresh token
+        $refreshToken = $refreshTokenGenerator->generate();
+        $user->addRefreshToken(new RefreshToken($user, $refreshToken));
+
+        // Persist refresh token
+        $entityManager = $this->doctrine->getManager();
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        return [
+            'accessToken' => $accessToken,
+            'refreshToken' => $refreshToken
+        ];
+    }
+
+    public function refreshToken(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $refreshToken = $data['refreshToken'];
+
+        // Validate refresh token
+        $refreshTokenEntity = $this->doctrine->getRepository(RefreshToken::class)->findOneBy(['refreshToken' => $refreshToken]);
+        if (!$refreshTokenEntity) {
+            return new JsonResponse(['error' => 'Invalid refresh token'], 401);
+        }
+
+        // Generate new access token based on refresh token
+        $user = $refreshTokenEntity->getUser();
+        $newAccessToken = $this->jwtManager->create($user);
+
+        // Invalidate old refresh token
+        $refreshTokenEntity->setInvalidated(true);
+
+        // Persist changes
+        $entityManager = $this->doctrine->getManager();
+        $entityManager->persist($refreshTokenEntity);
+        $entityManager->flush();
+
+        return new JsonResponse(['accessToken' => $newAccessToken]);
     }
 
     #[Route(path:'/register', name: 'app_register', methods: ['POST', 'GET'])]
@@ -93,7 +133,7 @@ class RegistrationController extends AbstractController
         //TODO: Implémenter une fonction qui va permettre d'ajouter une valeur de tâches par semaine à un utilisateur
         $data = json_decode($request->getContent(), true);
         $valueTasksWeek = $this->doctrine->getRepository(User::class)->findOneBy(['id' => $data['userId']]);
-        $valueTasksWeek->setWeekValue($data['value']);
+        $valueTasksWeek->setWeekValue($data['weekValue']);
         $entityManager = $this->doctrine->getManager();
         $entityManager->persist($valueTasksWeek);
         $entityManager->flush();
@@ -112,7 +152,7 @@ class RegistrationController extends AbstractController
 
         return $this->json(
             (object)[
-                'valueWeek' => $valueTasksWeek->getWeekValue(),
+                'weekValue' => $valueTasksWeek->getWeekValue(),
                 'userId' => $valueTasksWeek->getId(),
             ]
         );
@@ -122,7 +162,6 @@ class RegistrationController extends AbstractController
     #[Route(path:'/deleteAccount', name: 'app_delete_account', methods: ['DELETE'])]
     public function deleteAccount(Request $request):JsonResponse
     {
-        // TODO: Implémenter une fonction qui va permettre de supprimer un compte, ainsi que toutes les tasks et l'historique de l'utilisateur
         $data = json_decode($request->getContent(), true);
 
         // Récupérer l'utilisateur depuis la base de données
