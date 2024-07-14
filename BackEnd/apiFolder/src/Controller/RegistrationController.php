@@ -26,56 +26,31 @@ class RegistrationController extends AbstractController
     {
         $accessToken = $this->jwtManager->create($user);
 
-        // Generate refresh token
-        $refreshToken = $refreshTokenGenerator->generate();
-        $user->addRefreshToken(new RefreshToken($user, $refreshToken));
-
         // Persist refresh token
         $entityManager = $this->doctrine->getManager();
         $entityManager->persist($user);
         $entityManager->flush();
 
-        return [
-            'accessToken' => $accessToken,
-            'refreshToken' => $refreshToken
-        ];
+        return $accessToken;
     }
 
-    public function refreshToken(Request $request): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
-        $refreshToken = $data['refreshToken'];
-
-        // Validate refresh token
-        $refreshTokenEntity = $this->doctrine->getRepository(RefreshToken::class)->findOneBy(['refreshToken' => $refreshToken]);
-        if (!$refreshTokenEntity) {
-            return new JsonResponse(['error' => 'Invalid refresh token'], 401);
-        }
-
-        // Generate new access token based on refresh token
-        $user = $refreshTokenEntity->getUser();
-        $newAccessToken = $this->jwtManager->create($user);
-
-        // Invalidate old refresh token
-        $refreshTokenEntity->setInvalidated(true);
-
-        // Persist changes
-        $entityManager = $this->doctrine->getManager();
-        $entityManager->persist($refreshTokenEntity);
-        $entityManager->flush();
-
-        return new JsonResponse(['accessToken' => $newAccessToken]);
-    }
-
-    #[Route(path:'/register', name: 'app_register', methods: ['POST', 'GET'])]
+    public const REGISTER_ROUTE = 'app_register';
+    #[Route(path:'/register', name: self::REGISTER_ROUTE, methods: ['POST', 'GET'])]
     public function register(Request $request, UserPasswordHasherInterface $passwordHasher, JWTTokenManagerInterface $jwtManager):JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $plainPassword = $data['password'];
         $user = new User();
         $user->setEmail($data['email']);
-        // $user->setRoles(['USER']);
+
+        if($data['familyKey']){
+            // verifier également si le code famille existe déjà et si l'adress email est déjà enregistrée dans la table de User à la colonne list_Members
+            // $user = $this->doctrine->getRepository(User::class)->findOneBy(['family_key' => $data['familyKey']]);
+            $user->setFamilyKey($data['familyKey']);
+        }
         $user->setWeekValue(0);
+        $user->setSubscriptionKey(0);
+
         // Encoder le mot de passe
         $encodedPassword = $this->passwordHasher->hashPassword(
             $user,
@@ -89,7 +64,6 @@ class RegistrationController extends AbstractController
         
         // Récupérer l'utilisateur depuis la base de données
         $userFindForTokenReceive = $this->doctrine->getRepository(User::class)->findOneBy(['email' => $data['email']]);
-
         // Générer le token
         $token = $this->generateToken($userFindForTokenReceive);
 
@@ -102,7 +76,7 @@ class RegistrationController extends AbstractController
     public const LOGIN_ROUTE = 'app_login';
 
     #[Route(path: '/login', name: self::LOGIN_ROUTE, methods: ['POST','GET'])]
-    public function login(Request $request, AuthenticationUtils $authenticationUtils): jsonResponse
+    public function login(Request $request, AuthenticationUtils $authenticationUtils): JsonResponse
     {
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
@@ -114,21 +88,24 @@ class RegistrationController extends AbstractController
         $userFindForTokenReceive = $this->doctrine->getRepository(User::class)->findOneBy(
             ['email' => $data['email']]
         );
-        $userId = $userFindForTokenReceive->getId();
-        // Générer le token
         $token = $this->generateToken($userFindForTokenReceive);
-        return $this->json(
-            (object)[
-                'error' => $error,
-                'lastUserName'=> $lastUsername,
-                'token'=> $token,
-                'userId'=> $userId
-            ]
-        );
+
+        $userId = $userFindForTokenReceive->getId();
+        $familyKey = $userFindForTokenReceive->getFamilyKey();
+        $subscriptionKey = $userFindForTokenReceive->getSubscriptionKey();
+        // var_dump($userFindForTokenReceive);
+        return new JsonResponse([
+          'error' => $error,
+          'lastUserName' => $lastUsername,
+          'familyKey' => $familyKey,
+          'subscriptionKey' => $subscriptionKey,
+          'token' => $token,
+          'userId' => $userId
+        ]);
     }
     
     #[Route(path: '/addValueTasksWeek', name:'app_value_tasks', methods: ['PUT'])]
-    public function setValueTasksWeek(Request $request): jsonResponse
+    public function setValueTasksWeek(Request $request): JsonResponse
     {
         //TODO: Implémenter une fonction qui va permettre d'ajouter une valeur de tâches par semaine à un utilisateur
         $data = json_decode($request->getContent(), true);
@@ -146,7 +123,7 @@ class RegistrationController extends AbstractController
     }
 
     #[Route(path: '/userDetails/{userId}', name:'app_user_details', methods: ['GET'])]
-    public function userDetails(Request $request, $userId): jsonResponse
+    public function userDetails(Request $request, $userId): JsonResponse
     {
         $valueTasksWeek = $this->doctrine->getRepository(User::class)->findOneBy(['id' => $userId]);
 
@@ -158,6 +135,24 @@ class RegistrationController extends AbstractController
         );
     }
 
+    //route pour modifier son type d'abonnement (0 = gratuit, 1 = payant, 2 = famille)
+    #[Route(path: '/updateSubscriptionKey/{userId}', name: 'app_update_subscription_key', methods: ['PUT'])]
+    public function updateSubscriptionKey(Request $request, $userId): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $updateSubscriptionKey = $this->doctrine->getRepository(User::class)->findOneBy(['id' => $userId]);
+        $updateSubscriptionKey->setSubscriptionKey($data['subscriptionKey']);
+        $updateSubscriptionKey->setFamilyKey($data['familyKey']);
+
+        $entityManager = $this->doctrine->getManager();
+        $entityManager->persist($updateSubscriptionKey);
+        $entityManager->flush();
+        return $this->json(
+            (object)[
+                'data' => $updateSubscriptionKey,
+            ]
+        );
+    }
 
     #[Route(path:'/deleteAccount', name: 'app_delete_account', methods: ['DELETE'])]
     public function deleteAccount(Request $request):JsonResponse
@@ -177,5 +172,24 @@ class RegistrationController extends AbstractController
         return new JsonResponse([
             'status'=>'Compte supprimé',
         ]);
+    }
+
+    //route pour récupérer le nombre aléatoire de type familyKey envoyé et verifier s'il existe dans la base de données s'il existe déjà on renvoi un message d'erreur
+    #[Route(path: '/checkFamilyKey', name: 'app_check_family_key', methods: ['POST','GET'])]
+    public function checkFamilyKey(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        if($data['familyKey'] !== null){
+            $users = $this->doctrine->getRepository(User::class)->findBy(['familyKey' => $data['familyKey']]);
+                if($users){
+                    return new JsonResponse([
+                        'status'=>'Ce code existe déjà',
+                    ]);
+                }else{
+                return new JsonResponse([
+                    'status'=>'Le code est disponible',
+                ]);
+            }
+        }
     }
 }

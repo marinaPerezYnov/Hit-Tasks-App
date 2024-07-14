@@ -17,7 +17,7 @@ export default function RandomValueWeek() {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
-                "authorization": "Bearer " + sessionStorage.getItem("token")
+                "Authorization": "Bearer " + sessionStorage.getItem("token")
             },
             body: JSON.stringify({ weekValue: Math.floor(Math.random() * 8 + 3) * 10, userId: sessionStorage.getItem("userId") }),
         })
@@ -34,7 +34,7 @@ export default function RandomValueWeek() {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "authorization": "Bearer " + sessionStorage.getItem("token")
+                "Authorization": "Bearer " + sessionStorage.getItem("token")
             }
         })
         .then(response => {

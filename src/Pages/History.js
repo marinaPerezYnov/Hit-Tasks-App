@@ -52,7 +52,8 @@ export const History = () => {
       // je récupére le jour du mois
       const day = date.getDate();
       const week = Math.ceil(day / 7);
-
+      console.log("valuesForDatasets : ", valuesForDatasets[0].value)
+      console.log("Number(item.valueTasksCompleted) : ", Number(item.valueTasksCompleted));
       // Si les items sont dans la même semaine, additionnez les valeurs item.valueTasksCompleted et enregistrer la somme dans valuesForDatasets
         switch (week) {
           case 1:
@@ -94,11 +95,11 @@ export const History = () => {
     const year = currentDate.getFullYear();
     // Les mois sont indexés à partir de 0, donc ajoutez 1 pour obtenir le mois réel
     const month = (currentDate.getMonth() + 1);
-    fetch(`http://localhost:8081/getAllHistoric?userId=${sessionStorage.getItem("userId")}&date=${year}-${month.toString().padStart(2, '0')}`, {
+    fetch(`http://localhost:8081/getAllHistoric?userId=${sessionStorage.getItem("userId")}&date=${year}-${month.toString().padStart(2, '0')}&familyKey=${sessionStorage.getItem("familyKey")}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "authorization": "Bearer " + sessionStorage.getItem("token")
+        "Authorization": "Bearer " + sessionStorage.getItem("token")
       }
     })
     .then(response => {
@@ -110,6 +111,7 @@ export const History = () => {
       return response.json();
     })
     .then((data) => {
+      console.log("datas of historic : ", data.data);
       if (data.data.length === 0) {
         return setHistory([]);
       }

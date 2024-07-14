@@ -14,26 +14,54 @@ export const Register = () => {
   const [password, setPassword] = useState("");
   const [showLoader, setShowLoader] = useState(false);
   const navigate = useNavigate();
+
+  const urlPath = window.location.pathname;
+  console.log("urlPath", urlPath, Number(urlPath.split("/family_key=")[1]));
+  const familyKey = Number(urlPath.split("/family_key=")[1]);
+
   const registerToAccount = () => {
     setShowLoader(true);
-    // Fonctionnalité de transmission de données email et password au back pour création d'un compte
-    fetch("http://localhost:8081/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email: email, password: password }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        // J'enregistre le token dans le sessionStorage pour le conserver
-        // Modifier son stockage pour une meilleure sécurité
-        sessionStorage.setItem("token", data.token);
-        sessionStorage.setItem("userId", data.userId);
-        setShowLoader(false);
-        return navigate("/");
+    console.log("familyKey", familyKey);
+    if(!(familyKey?.length > 0) && familyKey === null) {
+      // Fonctionnalité de transmission de données email et password au back pour création d'un compte
+      fetch("http://localhost:8081/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email: email, password: password }),
       })
-      .catch((error) => console.log("error", error));
+        .then((response) => response.json())
+        .then((data) => {
+          // J'enregistre le token dans le sessionStorage pour le conserver
+          // Modifier son stockage pour une meilleure sécurité
+          sessionStorage.setItem("token", data.token);
+          sessionStorage.setItem("userId", data.userId);
+          // sessionStorage.setItem("familyKey", familyKey);
+          setShowLoader(false);
+          return navigate("/");
+        })
+        .catch((error) => console.log("error", error));
+    } else {
+      fetch("http://localhost:8081/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email: email, password: password, familyKey: familyKey }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          // J'enregistre le token dans le sessionStorage pour le conserver
+          // Modifier son stockage pour une meilleure sécurité
+          sessionStorage.setItem("token", data.token);
+          sessionStorage.setItem("userId", data.userId);
+          sessionStorage.setItem("familyKey", familyKey);
+          setShowLoader(false);
+          // return navigate("/");
+        })
+        .catch((error) => console.log("error", error));
+    }
   };
 
   return (

@@ -38,6 +38,14 @@ export default function Header() {
               <Link to="/history">Historique</Link>
             </li>
             <li>
+              <Link to="/accountSubscription">Subscribe</Link>
+            </li>
+            {sessionStorage.getItem("subscriptionKey") === "2" && (
+              <li>
+                <Link to="/addNewMember">Ajouter un membre</Link>
+              </li>
+            )}
+            <li>
               <Link to="/logout" onClick={()=>{
                 sessionStorage.clear();
               }}>Logout</Link>

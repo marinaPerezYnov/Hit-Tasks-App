@@ -37,9 +37,10 @@ export const ListTasks = () => {
   const handleClose = () => setOpen(false);
 
   const navigate = useNavigate();
+ 
   // Fonctionnalité de récupération des tâches est fonctionnelle
   const getTasks = () => {
-    fetch(`http://localhost:8081/getAllTasks/${sessionStorage.getItem("userId")}`, {
+    fetch(`http://localhost:8081/getAllTasks/${sessionStorage.getItem("userId")}&familyKey=${sessionStorage.getItem("familyKey")}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -74,11 +75,11 @@ export const ListTasks = () => {
     // Les mois sont indexés à partir de 0, donc ajoutez 1 pour obtenir le mois réel
     const month = (currentDate.getMonth() + 1);
     
-    fetch(`http://localhost:8081/getAllHistoric?userId=${sessionStorage.getItem("userId")}&date=${year}-${month.toString().padStart(2, '0')}`, {
+    fetch(`http://localhost:8081/getAllHistoric?userId=${sessionStorage.getItem("userId")}&date=${year}-${month.toString().padStart(2, '0')}&familyKey=${sessionStorage.getItem("familyKey")}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "authorization": "Bearer " + sessionStorage.getItem("token")
+        "Authorization": "Bearer " + sessionStorage.getItem("token")
       }
     })
     .then(response => {
@@ -116,7 +117,7 @@ export const ListTasks = () => {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        "authorization": "Bearer " + sessionStorage.getItem("token")
+        "Authorization": "Bearer " + sessionStorage.getItem("token")
       },
       body: JSON.stringify({ id: taskId }),
     })
@@ -126,13 +127,11 @@ export const ListTasks = () => {
       window.location.reload();
       navigate("/listTasks");
       setShowLoader(false);
-      // setToDelete(false)
       handleClose();
     })
     .catch((error) => console.log("error", error));
   };
 
-  
   return (
     <div>
       <h3 className="title">ListTasks</h3>
@@ -141,7 +140,8 @@ export const ListTasks = () => {
         {showLoader && <LinearBuffer />}
       </div>
       <ul>
-        {currentTasks.length > 0 ? currentTasks.map((task) => (
+        {currentTasks.length > 0 && currentTasks !== undefined ? currentTasks.map((task, index) => (
+          <>
           <li key={task.id} className="button">
             <div className="tasks" style={{
 
@@ -156,6 +156,9 @@ export const ListTasks = () => {
                     alignItems: "center",
               }}>
                 <p className="percentValueList">{task.taskValue} %</p>
+                {
+                Number(sessionStorage.getItem("userId")) === task.userId &&
+                <>
                 <Button 
                   sx={{
                     margin: "2%",
@@ -206,9 +209,11 @@ export const ListTasks = () => {
                         </Button> 
                       </Box>
                     </Modal>
+                    </>}
               </div>
             </div>
           </li>
+          </>
         )) : <p> No tasks</p>
         }
       </ul>

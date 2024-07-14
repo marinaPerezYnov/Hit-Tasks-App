@@ -18,16 +18,19 @@ export const Login = () => {
     fetch("http://localhost:8081/login", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({ email: email, password: password }),
     })
       .then((response) => response.json())
       .then((data) => {
+
         // J'enregistre le token dans le sessionStorage pour le conserver
         // Modifier son stockage pour une meilleure sécurité
         sessionStorage.setItem("token", data.token);
         sessionStorage.setItem("userId", data.userId);
+        sessionStorage.setItem("familyKey", data.familyKey);
+
         setShowLoader(false);
         return navigate("/");
       })

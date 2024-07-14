@@ -37,6 +37,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: "integer", nullable: true)]
     private $weekValue;
 
+    //clé d'abonnement 0 = compte seul, 1 = compte famille
+    #[ORM\Column(type: "integer")]
+    private $subscriptionKey;
+
+    //numéro aléatoire de 6 chiffres pour le compte famille qui sera associé à chaque membre de la famille
+    #[ORM\Column(type: "integer", nullable: true)]
+    private $familyKey;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -69,6 +77,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setWeekValue(?int $weekValue): self
     {
         $this->weekValue = $weekValue;
+
+        return $this;
+    }
+
+    public function getSubscriptionKey(): ?int
+    {
+        return $this->subscriptionKey;
+    }
+
+    public function setSubscriptionKey(int $subscriptionKey): self
+    {
+        $this->subscriptionKey = $subscriptionKey;
+
+        return $this;
+    }
+
+    public function getFamilyKey(): ?int
+    {
+        return $this->familyKey;
+    }
+
+    public function setFamilyKey(?int $familyKey): self
+    {
+        $this->familyKey = $familyKey;
 
         return $this;
     }

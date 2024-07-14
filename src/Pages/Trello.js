@@ -8,7 +8,6 @@ import "./styles/trello.css";
 
 const saveTasks = (datas) => {
     // Modifier pour enregistrer la tâche qui contient comme status COLUMN_NAMES.DONE alors enregistrer la tâche dans la table historic
-    console.log("datas to register on History table : ", datas)
     const currentDate = new Date(datas.data.date);
     const year = currentDate.getFullYear();
     // Les mois sont indexés à partir de 0, donc ajoutez 1 pour obtenir le mois réel
@@ -17,7 +16,7 @@ const saveTasks = (datas) => {
     // Formattez la date au format YYYY-MM
     // const formattedDate = `${year}-${month.toString().padStart(2, '0')}`;
     const formattedDate = `${currentDate}`;
-
+    console.log("task value : ", datas.data.taskValue);
     fetch("http://localhost:8081/addHistoric", {
       method: "POST",
       headers: {
@@ -52,7 +51,6 @@ const saveTasks = (datas) => {
     })
     .then((response) => response.json())
     .then((data) => {
-        console.log("data : ", data)
         if(newStatus === 3) {
             saveTasks(data);
         }
@@ -226,7 +224,7 @@ export const Trello = () => {
 
   useEffect(() => {
     // requête pour récupérer les tâches
-    fetch(`http://localhost:8081/getAllTasks/${sessionStorage.getItem("userId")}`, {
+    fetch(`http://localhost:8081/getAllTasks/${sessionStorage.getItem("userId")}&familyKey=${sessionStorage.getItem("familyKey")}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -240,15 +238,15 @@ export const Trello = () => {
       return response.json();
     })
     .then((data) => {
-        setItems(data.data.map((item) => {
-            if (item.status === 0) {
-                return {id: item.id, name: item.name, column: DO_IT}
-            } else if (item.status === 1) {
-                return {id: item.id, name: item.name, column: IN_PROGRESS}
-            } else if (item.status === 2) {
-                return {id: item.id, name: item.name, column: AWAITING_REVIEW}
-            } else if (item.status === 3) {
-                return {id: item.id, name: item.name, column: DONE}
+        setItems(data.data.map((item, index) => {
+            if (item[0]?.status === 0) {
+                return {id: item[0].id, name: item[0].name, column: DO_IT}
+            } else if (item[0]?.status === 1) {
+                return {id: item[0].id, name: item[0].name, column: IN_PROGRESS}
+            } else if (item[0]?.status === 2) {
+                return {id: item[0].id, name: item[0].name, column: AWAITING_REVIEW}
+            } else if (item[0]?.status === 3) {
+                return {id: item[0].id, name: item[0].name, column: DONE}
             }
         }));
     })
@@ -274,7 +272,8 @@ export const Trello = () => {
   };
 
   const returnItemsForColumn = (columnName) => {
-    return items
+    if(items !== undefined) {
+      return items
       .filter((item) => item.column === columnName)
       .map((item, index) => (
         <MovableItem
@@ -286,6 +285,7 @@ export const Trello = () => {
           moveCardHandler={moveCardHandler}
         />
       ));
+    }
   };
 
   const { DO_IT, IN_PROGRESS, AWAITING_REVIEW, DONE } = COLUMN_NAMES;

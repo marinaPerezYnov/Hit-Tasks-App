@@ -26,7 +26,6 @@ export const Calendar = ({setAddNewTask, listTasks, setCurrentTasks, currentTask
     const [isClosedForm, setIsClosedForm] = useState(true);
     const [nameTask, setNameTask] = useState("");
     const [valueTask, setValueTask] = useState(0);
-    const [isSelected, setIsSelected] = useState(false);
   // Une fonctionnalité pour planifier le jour de la semaine où l'on souhaite faire une activité et sélectionner l'heure de début et l'heure de fin
   function setATask() {
     fetch("http://localhost:8081/addTasks", {
@@ -52,51 +51,55 @@ export const Calendar = ({setAddNewTask, listTasks, setCurrentTasks, currentTask
   }
 
   const CustomDay = (props) => {
-    const { day, outsideCurrentMonth, currentTasks, ...other } = props;
+    const { day, outsideCurrentMonth, ...other } = props;
     const currentDay = new Date(day);
+    let isSelected = false;
 
-    const isSelected = listTasks.some((tache) => {
-    const date = new Date(tache.date);
-    if(date.getDate() === currentDay.getDate()) {
-      return true;
+    for(let i = 0; i < listTasks.length; i++) {
+      const date = new Date(listTasks[i][0]?.date);
+      if(date.getDate() === currentDay.getDate()) {
+        isSelected = true;
+      }
     }
-    });
+
     const showDetailsListForDay = () => {
-      listTasks.some((tache) => {
-        const date = new Date(tache.date);
+      const arrOfTasks = [];
+      for(let i = 0; i < listTasks.length; i++) {
+        const date = new Date(listTasks[i][0]?.date);
         if(date.getDate() === currentDay.getDate()) {
-          console.log("tache", tache);
-         setCurrentTasks(currentTasks => [...currentTasks, tache])
+          arrOfTasks.push(listTasks[i][0]);
         }
-        });
+      }
+        setCurrentTasks(arrOfTasks);
     };
-  return (
-        <Badge
-          key={props.day.toString()}
-          overlap="circular"
-          badgeContent={
-            isSelected ? (
-              <EventAvailableIcon
-                sx={{
-                  fontSize: "small",
-                  color: `black`,
+
+    return (
+          <Badge
+            key={props.day.toString()}
+            overlap="circular"
+            badgeContent={
+              isSelected ? (
+                <EventAvailableIcon
+                  sx={{
+                    fontSize: "small",
+                    color: `black`,
+                  }}
+                  className="reserved-day"
+                />
+              ) : undefined
+            }
+          >
+              <PickersDay
+                {...other}
+                onClick={()=>{
+                  setCurrentTasks([]);
+                  showDetailsListForDay()
                 }}
-                className="reserved-day"
+                outsideCurrentMonth={outsideCurrentMonth}
+                day={day}
               />
-            ) : undefined
-          }
-        >
-            <PickersDay
-              {...other}
-              onClick={()=>{
-                setCurrentTasks([]);
-                showDetailsListForDay()
-              }}
-              outsideCurrentMonth={outsideCurrentMonth}
-              day={day}
-            />
-        </Badge>
-      );
+          </Badge>
+    );
   };
 
   return (

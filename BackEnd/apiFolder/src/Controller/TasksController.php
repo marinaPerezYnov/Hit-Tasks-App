@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Tasks;
 use App\Entity\Historic;
+use App\Entity\User;
 use App\Repository\TasksRepository;
 use App\Repository\HistoricRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -40,11 +41,22 @@ class TasksController extends AbstractController
         );
     }
 
-    #[Route(path: '/getAllTasks/{userId}', name: 'app_get_all_tasks', methods: ['GET','POST'])]
-    public function getAllTasks(Request $request, $userId): Response
+    #[Route(path: '/getAllTasks/{userId}&familyKey={familyKey}', name: 'app_get_all_tasks', methods: ['GET','POST'])]
+    public function getAllTasks(Request $request, $userId, $familyKey): Response
     {
         //TODO: Implémenter une fonction qui va permettre de récupérer toutes les tasks de l'utilisateur avec l'ID $userId
-        $allTasks = $this->doctrine->getRepository(Tasks::class)->findBy(['userId' => $userId]);
+        //Récupérer tous les id des utilisateurs qui ont la même familyKey
+        $allTasks = [];
+
+        if($familyKey != null){
+            $allUserId = $this->doctrine->getRepository(User::class)->findBy(['familyKey' => $familyKey]);
+
+            foreach ($allUserId as $userId) {
+                $allTasks[] = $this->doctrine->getRepository(Tasks::class)->findBy(['userId' => $userId]);
+            }
+        }else{
+            $allTasks = $this->doctrine->getRepository(Tasks::class)->findBy(['userId' => $userId]);
+        }
         return $this->json(
             (object)[
                 'data' => $allTasks,

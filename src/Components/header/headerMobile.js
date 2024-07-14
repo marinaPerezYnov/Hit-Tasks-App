@@ -70,6 +70,10 @@ export default function HeaderMobile() {
                 <Link style={style} to="/register">Register</Link>
                 <Link style={style} to="/listTasks">ListTasks</Link>
                 <Link style={style} to="/tasksOrganisators">Organisateur de temps</Link>
+                <Link style={style} to="/accountSubscription">Abonnement</Link>
+                {sessionStorage.getItem("subscriptionKey") === "2" && (
+                  <Link style={style} to="/addNewMember">Ajouter un membre</Link>
+                )}
                 <Link style={style} to="/history">Historique</Link>
             </div>
         </MenuItem>

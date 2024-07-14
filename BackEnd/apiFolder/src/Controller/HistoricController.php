@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Historic;
+use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -41,12 +42,24 @@ class HistoricController extends AbstractController
     #[Route(path: '/getAllHistoric', name: 'app_get_all_historic', methods: ['GET'])]
     public function getAllHistoric(Request $request): Response
     {
+        //rajouter la familyKey pour récupérer les historiques de la famille
         $userId = $request->query->get('userId');
         $date = $request->query->get('date');
+        $familyKey = $request->query->get('familyKey');
+
         //transformer la date au format YYYY-MM
         $formatDate = date('Y-m', strtotime($date));
-        $allHistoric = $this->doctrine->getRepository(Historic::class)->findBy(['userId' => $userId]);
-        // $allHistoric = $this->doctrine->getRepository(Historic::class)->findBy(['date' => $formatDate, 'userId' => $userId]);
+        $allHistoric = [];
+
+        if($familyKey !== "null"){
+            $allUserId = $this->doctrine->getRepository(User::class)->findBy(['familyKey' => $familyKey]);
+            foreach ($allUserId as $userId) {
+                $allHistoric[] = $this->doctrine->getRepository(Historic::class)->findBy(['date' => $formatDate, 'userId' => $userId]);
+
+            }
+        }else{
+            $allHistoric = $this->doctrine->getRepository(Historic::class)->findBy(['userId' => $userId]);
+        }
 
         return $this->json(
             (object)[
