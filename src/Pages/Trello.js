@@ -16,14 +16,14 @@ const saveTasks = (datas) => {
     // Formattez la date au format YYYY-MM
     // const formattedDate = `${year}-${month.toString().padStart(2, '0')}`;
     const formattedDate = `${currentDate}`;
-    console.log("task value : ", datas.data.taskValue);
+
     fetch("http://localhost:8081/addHistoric", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": "Bearer " + sessionStorage.getItem("token")
       },
-      body: JSON.stringify({taskId: datas.data.id ,date: formattedDate, valueTasksCompleted: datas.data.taskValue, userId: sessionStorage.getItem("userId") }),
+      body: JSON.stringify({taskId: datas.data.id ,date: new Date(currentDate).toISOString(), valueTasksCompleted: datas.data.taskValue, userId: sessionStorage.getItem("userId") }),
     })
     .then((response) => response.json())
     .catch((error) => console.log("error", error));
@@ -40,7 +40,7 @@ const saveTasks = (datas) => {
         newStatus = 2;
     else if(status === COLUMN_NAMES.DONE)
         newStatus = 3;
-
+    console.log("id  et status: ", id, status, newStatus);
     fetch("http://localhost:8081/updateStatusTasks", {
      method: "PUT",
         headers: {
@@ -51,6 +51,8 @@ const saveTasks = (datas) => {
     })
     .then((response) => response.json())
     .then((data) => {
+      console.log("data : ", data);
+      console.log("newStatus : ", newStatus);
         if(newStatus === 3) {
             saveTasks(data);
         }
@@ -62,14 +64,20 @@ const saveTasks = (datas) => {
 const MovableItem = ({
   name,
   index,
+  id,
   currentColumnName,
   moveCardHandler,
   setItems
 }) => {
   const changeItemColumn = (currentItem, columnName) => {
+
+    console.log("currentItem : ", currentItem);
     setItems((prevState) => {
       return prevState.map((e) => {
-        if(columnName !== currentItem.currentColumnName) {
+        console.log("element : ", e);
+        console.log("columnName : ", columnName !== currentItem.currentColumnName);
+        if(columnName !== currentItem.currentColumnName && e.id === currentItem.id) {
+          console.log("id : ", e.id)
             updateStatusTasks(e.id, columnName);
         }
         return {
@@ -126,7 +134,7 @@ const MovableItem = ({
 
   const [{ isDragging }, drag] = useDrag({
     type: "Our first type", // <-- Ajoutez cette ligne
-    item: { index, name, currentColumnName },
+    item: { index, name, currentColumnName, id },
     end: (item, monitor) => {
       const dropResult = monitor.getDropResult();
 
@@ -238,15 +246,16 @@ export const Trello = () => {
       return response.json();
     })
     .then((data) => {
-        setItems(data.data.map((item, index) => {
-            if (item[0]?.status === 0) {
-                return {id: item[0].id, name: item[0].name, column: DO_IT}
-            } else if (item[0]?.status === 1) {
-                return {id: item[0].id, name: item[0].name, column: IN_PROGRESS}
-            } else if (item[0]?.status === 2) {
-                return {id: item[0].id, name: item[0].name, column: AWAITING_REVIEW}
-            } else if (item[0]?.status === 3) {
-                return {id: item[0].id, name: item[0].name, column: DONE}
+        setItems(data.data[1].map((item, index) => {
+          console.log("item 1: ", item);
+            if (item.status === 0) {
+                return {id: item.id, name: item.name, column: DO_IT}
+            } else if (item.status === 1) {
+                return {id: item.id, name: item.name, column: IN_PROGRESS}
+            } else if (item.status === 2) {
+                return {id: item.id, name: item.name, column: AWAITING_REVIEW}
+            } else if (item.status === 3) {
+                return {id: item.id, name: item.name, column: DONE}
             }
         }));
     })
@@ -279,6 +288,7 @@ export const Trello = () => {
         <MovableItem
           key={item.id}
           name={item.name}
+          id={item.id}
           currentColumnName={item.column}
           setItems={setItems}
           index={index}

@@ -28,10 +28,7 @@ class Historic
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $valueTasksCompleted;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[ORM\Column(type:"datetime", nullable: true)]
     private $date;
 
     public function getId(): ?int
@@ -74,12 +71,12 @@ class Historic
         return $this;
     }
 
-    public function getDate(): ?string
+    public function getDate(): ?\DateTime
     {
         return $this->date;
     }
 
-    public function setDate(?string $date): self
+    public function setDate(?\DateTime $date): self
     {
         $this->date = $date;
 

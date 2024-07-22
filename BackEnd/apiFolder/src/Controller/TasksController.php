@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Persistence\ManagerRegistry;
+use DateTime;
 
 class TasksController extends AbstractController
 {
@@ -24,11 +25,26 @@ class TasksController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
         $tasks = new Tasks();
+
+        // Supposons que 'date' est défini et non vide
+        if (isset($data['date']) && !empty($data['date'])) {
+            // Convertir la chaîne de date en objet DateTime
+            $dateString = $data['date'];
+            $dateTime = DateTime::createFromFormat('Y-m-d\TH:i:s.v\Z', $dateString);
+
+            if ($dateTime === false) {
+                // Gérer l'erreur si la date est invalide
+                return new Response("Invalid date format", Response::HTTP_BAD_REQUEST);
+            }
+        } else {
+            $dateTime = null; // Ou gérer l'absence de date selon vos besoins
+        }
+
         $tasks->setName($data['name']);
         $tasks->setTaskValue($data['taskValue']);
         $tasks->setUserId($data['userId']);
-        $tasks->setDate($data['date']);
         $tasks->setTime($data['time']);
+        $tasks->setDate($dateTime);
         
         $entityManager = $this->doctrine->getManager();
         $entityManager->persist($tasks);

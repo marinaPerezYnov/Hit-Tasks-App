@@ -91,8 +91,11 @@ export const ListTasks = () => {
       return response.json();
     })
     .then((data) => {
+      // fusionner dans un seul tableau les tableaux de données récupérées dans data.data 
+      const tableauFusionne = data.data.reduce((acc, tableau) => acc.concat(tableau), []);
+
       // On va boucler sur le tableau de données et si l'id de la tâche correspnd à l'id de listTask, alors on va modifier le style de la tâche
-      data.data.forEach((item) => {
+      tableauFusionne.forEach((item) => {
         listTasks.forEach((task) => {
           if (item.taskId === task.id) {
             task.isFinish = true;
@@ -135,7 +138,7 @@ export const ListTasks = () => {
   return (
     <div>
       <h3 className="title">ListTasks</h3>
-        <Calendar setAddNewTask={setAddNewTask} listTasks={listTasks} setCurrentTasks={setCurrentTasks} currentTasks= {currentTasks}/>
+        <Calendar setAddNewTask={setAddNewTask} listTasks={listTasks} setCurrentTasks={setCurrentTasks} currentTasks={currentTasks}/>
       <div>
         {showLoader && <LinearBuffer />}
       </div>

@@ -20,7 +20,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 export const History = () => {
   const [history, setHistory] = useState([]);
-  // dayjs(date)
+
   const [date, setDate] = useState(dayjs());
   // const [calendarOpen, setCalendarOpen] = useState(false);
   const [week, setWeek] = useState(0);
@@ -42,50 +42,40 @@ export const History = () => {
       week: 0
     }
   ];
-  // Fonction pour ouvrir le calendrier
-  // const handleOpenCalendar = () => {
-  //   setCalendarOpen(true);
-  // };
+
   function getWeekNumer(data, id) {
-    data.data.forEach((item) => {
-      const date = new Date(item.date);
-      // je récupére le jour du mois
-      const day = date.getDate();
-      const week = Math.ceil(day / 7);
-      console.log("valuesForDatasets : ", valuesForDatasets[0].value)
-      console.log("Number(item.valueTasksCompleted) : ", Number(item.valueTasksCompleted));
-      // Si les items sont dans la même semaine, additionnez les valeurs item.valueTasksCompleted et enregistrer la somme dans valuesForDatasets
-        switch (week) {
-          case 1:
-            valuesForDatasets[0].week = week;
-            // Si deux éléments sont dans la même semaine, additionnez les valeurs item.valueTasksCompleted et enregistrer la somme dans valuesForDatasets[0].value
-            valuesForDatasets[0].value += Number(item.valueTasksCompleted);
-            break 
-          case 2:
-            valuesForDatasets[1].week = week;
-            // Si deux éléments sont dans la même semaine, additionnez les valeurs item.valueTasksCompleted et enregistrer la somme dans valuesForDatasets[1].value
-            valuesForDatasets[1].value += Number(item.valueTasksCompleted);
-            break 
-          case 3:
-            valuesForDatasets[2].week = week;
-            // Si deux éléments sont dans la même semaine, additionnez les valeurs item.valueTasksCompleted et enregistrer la somme dans valuesForDatasets[2].value
-            valuesForDatasets[2].value += Number(item.valueTasksCompleted);
-            break 
-          case 4:
-            valuesForDatasets[3].week = week;
-            // Si deux éléments sont dans la même semaine, additionnez les valeurs item.valueTasksCompleted et enregistrer la somme dans valuesForDatasets[3].value
-            valuesForDatasets[3].value += Number(item.valueTasksCompleted);
-            break;
-          default:
-            return 0;
-        }
-        // const currentWeekDataset = valuesForDatasets.find(
-        //   (dataset) => dataset.week === week
-        // );
-    
-        // if (currentWeekDataset) {
-        //   currentWeekDataset.value += Number(item.valueTasksCompleted);
-        // }
+    data.forEach((item) => {
+        const date = new Date(item.date);
+        // je récupére le jour du mois
+        const day = date.getDate();
+
+        const week = Math.ceil(day / 7);
+        
+        // Si les items sont dans la même semaine, additionnez les valeurs item.valueTasksCompleted et enregistrer la somme dans valuesForDatasets
+          switch (week) {
+            case 1:
+              valuesForDatasets[0].week = week;
+              // Si deux éléments sont dans la même semaine, additionnez les valeurs item.valueTasksCompleted et enregistrer la somme dans valuesForDatasets[0].value
+              valuesForDatasets[0].value += Number(item.valueTasksCompleted);
+              break 
+            case 2:
+              valuesForDatasets[1].week = week;
+              // Si deux éléments sont dans la même semaine, additionnez les valeurs item.valueTasksCompleted et enregistrer la somme dans valuesForDatasets[1].value
+              valuesForDatasets[1].value += Number(item.valueTasksCompleted);
+              break 
+            case 3:
+              valuesForDatasets[2].week = week;
+              // Si deux éléments sont dans la même semaine, additionnez les valeurs item.valueTasksCompleted et enregistrer la somme dans valuesForDatasets[2].value
+              valuesForDatasets[2].value += Number(item.valueTasksCompleted);
+              break 
+            case 4:
+              valuesForDatasets[3].week = week;
+              // Si deux éléments sont dans la même semaine, additionnez les valeurs item.valueTasksCompleted et enregistrer la somme dans valuesForDatasets[3].value
+              valuesForDatasets[3].value += Number(item.valueTasksCompleted);
+              break;
+            default:
+              return 0;
+          }
     });
   }
   const getHistory = () => {
@@ -111,24 +101,26 @@ export const History = () => {
       return response.json();
     })
     .then((data) => {
-      console.log("datas of historic : ", data.data);
+      // valueTaskCompleted always equal 0
       if (data.data.length === 0) {
         return setHistory([]);
       }
-      getWeekNumer(data);
-      // si data.data.length est === 0, alors on doit retourner un tableau vide 
-      // si data.data.length est < 4, alors on doit ajouter des objets dans data.data pour que data.data.length soit égal à 4
-      if(data.data.length < 4) {
-        for (let i = data.data.length; i < 4; i++) {
-          data.data.push({
-            id: i,
-            date: `${year}-${month.toString().padStart(2, '0')}`,
-            valueTasksCompleted: 0
-          });
+
+      // fusionner dans un seul tableau les tableaux de données récupérées dans data.data 
+      const tableauFusionne = data.data.reduce((acc, tableau) => acc.concat(tableau), []);
+
+      getWeekNumer(tableauFusionne);
+
+      valuesForDatasets.forEach((element, index) => {
+        if(element.value === 0 && element.week === 0) {
+          valuesForDatasets[index].value = 0;
+          valuesForDatasets[index].week = index + 1;
         }
-      }
+        
+      });
+
       // récupérer la valeur week retournée par la fonction getWeekNumer et l'associer au label de datasets
-      const arrDatasets = data.data.map((item,index) => (
+      const arrDatasets = valuesForDatasets.map((item,index) => (
         {
         id: parseInt(item.id),
         datasets: [{

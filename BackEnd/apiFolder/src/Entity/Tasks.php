@@ -32,7 +32,7 @@ class Tasks
     #[ORM\Column(type: 'integer', nullable: true)]
     private $taskValue;
 
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[ORM\Column(type:"datetime", nullable: true)]
     private $date;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
@@ -83,12 +83,12 @@ class Tasks
         return $this;
     }
 
-    public function getDate(): ?string
+    public function getDate(): ?\DateTime
     {
         return $this->date;
     }
 
-    public function setDate(?string $date): self
+    public function setDate(?\DateTime $date): self
     {
         $this->date = $date;
 

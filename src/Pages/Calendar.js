@@ -34,11 +34,12 @@ export const Calendar = ({setAddNewTask, listTasks, setCurrentTasks, currentTask
         "Content-Type": "application/json",
         "Authorization": "Bearer " + sessionStorage.getItem("token"), 
       },
-      body: JSON.stringify({ 
+      body: 
+        JSON.stringify({ 
         name: nameTask, 
         taskValue: valueTask, 
         userId: sessionStorage.getItem("userId"), 
-        date: `${new Date(selectedDate)}`, 
+        date: new Date(selectedDate).toISOString(),
         time: `${selectedTime.hour()}:${selectedTime.minute()}`
        }),
     })
@@ -53,23 +54,42 @@ export const Calendar = ({setAddNewTask, listTasks, setCurrentTasks, currentTask
   const CustomDay = (props) => {
     const { day, outsideCurrentMonth, ...other } = props;
     const currentDay = new Date(day);
+    let date;
     let isSelected = false;
 
     for(let i = 0; i < listTasks.length; i++) {
-      const date = new Date(listTasks[i][0]?.date);
-      if(date.getDate() === currentDay.getDate()) {
-        isSelected = true;
+      for(let j = 0; j < listTasks[i].length; j++) {
+        date = new Date(listTasks[i][j]?.date);
+        if(
+          date.getDate() === currentDay.getDate()
+          && date.getMonth() === currentDay.getMonth()
+          && date.getFullYear() === currentDay.getFullYear()
+        ) {
+          isSelected = true;
+        }
       }
     }
 
     const showDetailsListForDay = () => {
       const arrOfTasks = [];
       for(let i = 0; i < listTasks.length; i++) {
-        const date = new Date(listTasks[i][0]?.date);
-        if(date.getDate() === currentDay.getDate()) {
-          arrOfTasks.push(listTasks[i][0]);
+        for(let j = 0; j < listTasks[i].length; j++) {
+          date = new Date(listTasks[i][j]?.date);
+          if(
+            date.getDate() === currentDay.getDate()
+            && date.getMonth() === currentDay.getMonth()
+            && date.getFullYear() === currentDay.getFullYear()
+          ) {
+            arrOfTasks.push(listTasks[i][j]);
+          }
         }
+        // const date = new Date(listTasks[i][0]?.date);
+        // if(date.getDate() === currentDay.getDate()) {
+        //   console.log("liste : ", listTasks[i][0]);
+        //   arrOfTasks.push(listTasks[i][0]);
+        // }
       }
+        console.log("arrOfTasks : ", arrOfTasks);
         setCurrentTasks(arrOfTasks);
     };
 
