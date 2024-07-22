@@ -18,8 +18,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: npm install
       - name: 🚀 Build app
-          env:
-            CI: false 
+        env:
+          CI: false 
         run: npm run build
       - name: Setup Pages
         id: pages
