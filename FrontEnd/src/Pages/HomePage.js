@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 
 /* UTILS */
-import RandomValueWeek from "./../Components/randomValueWeek/randomValueWeek";
+import RandomValueWeek from "../Components/randomValueWeek/randomValueWeek";
 import "./styles/home.css";
 
 export const HomePage = () => {

@@ -10,7 +10,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import LinearBuffer from "./../Components/loader/loader";
+import LinearBuffer from "../Components/loader/loader";
 
 import dayjs from "dayjs";
 import Grid from "@mui/material/Grid";

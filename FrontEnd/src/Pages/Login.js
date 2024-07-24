@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 /* MUI */
 import { Button } from "@mui/material";
-import LinearBuffer from "./../Components/loader/loader";
+import LinearBuffer from "../Components/loader/loader";
 /* UTILS */
 import { Form } from "../Components/form/form";
 

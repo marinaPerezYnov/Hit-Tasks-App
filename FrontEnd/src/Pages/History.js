@@ -2,8 +2,8 @@
 import { useEffect, useState } from "react";
 
 /* UTILS */
-import PieChart from "./../Utils/Diagramms/percent";
-import data from "./../Utils/Mocks/History/mocks";
+import PieChart from "../Utils/Diagramms/percent";
+import data from "../Utils/Mocks/History/mocks";
 import "./styles/history.css";
 
 /* DAYJS */
@@ -12,7 +12,7 @@ import dayjs from "dayjs";
 /* MUI */
 import { Box } from "@mui/material";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import LinearBuffer from "./../Components/loader/loader";
+import LinearBuffer from "../Components/loader/loader";
 import 'dayjs/locale/fr';
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';

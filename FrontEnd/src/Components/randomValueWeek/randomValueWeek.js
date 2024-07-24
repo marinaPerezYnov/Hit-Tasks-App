@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from "react";
 
 /* UTILS */
-import "./../../Pages/styles/randomValueWeek.css";
+import "../../Pages/styles/randomValueWeek.css";
 
 export default function RandomValueWeek() {
     const [valueWeek, setValueWeek] = useState(0);

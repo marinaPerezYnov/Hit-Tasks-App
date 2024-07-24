@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { COLUMN_NAMES } from "./../Components/trello/Constants";
+import { COLUMN_NAMES } from "../Components/trello/Constants";
 // import { tasks } from "./../Components/trello/tasks";
 
 import "./styles/trello.css";
