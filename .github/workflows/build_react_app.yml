@@ -35,10 +35,8 @@ jobs:
         with:
           source: ./dist # Remplacer avec le répertoire de votre build
           token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name:  Création du fichier de version
-        run: echo "Version: $(git rev-parse --abbrev-ref HEAD)" > version.txt
-
+      # - name:  Création du fichier de version
+      #   run: echo "Version: $(git rev-parse --abbrev-ref HEAD)" > version.txt
       - name: ⬆️ Mise à jour du fichier README.md
         run: cat version.txt >> README.md
 
