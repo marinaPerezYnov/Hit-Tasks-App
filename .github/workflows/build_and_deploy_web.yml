@@ -19,9 +19,9 @@ jobs:
           node-version: ${{ matrix.node-version }}
           # cache: yarn
       - name: Install dependencies
-        run: npm install
+        run: cd FrontEnd && npm install
       - name: Build web app
-        run: npm run deploy
+        run: cd FrontEnd && npm run deploy
         # env:
           # GITHUB_TOKEN: ${{ secrets.TOKEN }}
           # TOKEN: ${{ secrets.TOKEN }}
