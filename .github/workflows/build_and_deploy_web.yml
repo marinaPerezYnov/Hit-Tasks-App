@@ -1,9 +1,9 @@
 name: build and deploy Web Application
 on:
   push:
-    branches: [ staging ]
-  pull_request:
-    branches: [ staging ]
+    branches: [ gh-pages ]
+  # pull_request:
+  #   branches: [ gh-pages ]
 jobs:  
   build:
     runs-on: ubuntu-latest
