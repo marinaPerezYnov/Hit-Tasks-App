@@ -22,16 +22,16 @@ jobs:
         run: npm install
       - name: Build web app
         run: npm run deploy
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
-          TOKEN: ${{ secrets.TOKEN }}
+        # env:
+          # GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          # TOKEN: ${{ secrets.TOKEN }}
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v3
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           TOKEN: ${{ secrets.TOKEN }}
-          # CI: false
+          CI: false
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
@@ -44,10 +44,10 @@ jobs:
       name: github-pages
       url: ${{steps.deployment.outputs.page_url}}
     runs-on: ubuntu-latest
-    # permissions:
-      # pages: write
+    permissions:
+      pages: write
       # to deploy to Pages
-      # id-token: write
+      id-token: write
       # to verify the deployment originates from a source
     #Add a dependency to the build job
     needs: build
