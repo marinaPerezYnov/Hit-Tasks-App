@@ -1,0 +1,69 @@
+.formToAddTask {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 2% auto;
+    flex-direction: column;
+}
+
+.button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    list-style: none;
+    border: 1px solid white;
+    width: 65%;
+    /* padding-left: 2%; */
+    margin: 2% auto;
+    flex-direction: column;
+}
+
+.title {
+    color: white;
+}
+
+.tasks {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+    max-height: 40px;
+}
+
+.percentValueList {
+    font-size: 1.5rem;
+    padding: 5px;
+    min-inline-size: max-content;
+    font-weight: 600;
+}
+
+.description {
+    font-weight: 600;
+    padding-left: 10px;
+}
+
+
+/* Media query pour les écrans de petite taille (mobiles) */
+@media only screen and (max-width: 600px) {
+    .button {
+        width: auto;
+    }
+  }
+  
+  /* Media query pour les écrans de taille moyenne (tablettes) */
+  @media only screen and (min-width: 601px) and (max-width: 992px) {
+  }
+  
+  /* Media query pour les écrans de grande taille (desktop) */
+  @media only screen and (min-width: 993px) {
+    .button {
+        width: 45%;
+    }
+  }
+
+  .css-i9fmh8-MuiBackdrop-root-MuiModal-backdrop {
+    left: initial !important;
+    position: inherit !important;
+    background-color: white !important;
+  }
