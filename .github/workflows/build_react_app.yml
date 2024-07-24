@@ -22,18 +22,18 @@ jobs:
           CI: false 
         run: npm run build
 
-      - name: Setup Pages
-        id: pages
-        uses: actions/configure-pages@v3
-        with:
-          enablement: true
-      # - name: Build web app
-      #   run: npm run predeploy
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
-        with:
-          path: Hit-Tasks-App/dist
-          if-no-files-found: error
+      # - name: Setup Pages
+      #   id: pages
+      #   uses: actions/configure-pages@v3
+      #   with:
+      #     enablement: true
+      # # - name: Build web app
+      # #   run: npm run predeploy
+      # - name: Upload artifact
+      #   uses: actions/upload-pages-artifact@v2
+      #   with:
+      #     path: Hit-Tasks-App/dist
+      #     if-no-files-found: error
   # Deploy job
   deploy:
     #Deploy to the github-pages environment
