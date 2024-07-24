@@ -37,10 +37,10 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
       # - name:  Création du fichier de version
       #   run: echo "Version: $(git rev-parse --abbrev-ref HEAD)" > version.txt
-      - name: ⬆️ Mise à jour du fichier README.md
-        run: cat version.txt >> README.md
+      # - name: ⬆️ Mise à jour du fichier README.md
+      #   run: cat version.txt >> README.md
 
-      - name:  Envoi des fichiers modifiés
-        uses: actions/upload-artifact@v2
-        with:
-          path: [ version.txt, README.md ]
+      # - name:  Envoi des fichiers modifiés
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     path: [ version.txt, README.md ]
