@@ -1,4 +1,0 @@
-framework:
-    router:
-        utf8: true
-        strict_requirements: true  # Si nécessaire, activez les exigences strictes du routeur

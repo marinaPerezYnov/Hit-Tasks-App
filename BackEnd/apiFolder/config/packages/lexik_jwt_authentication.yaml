@@ -1,9 +1,0 @@
-lexik_jwt_authentication:
-    secret_key: '%env(resolve:JWT_SECRET_KEY)%' # Clé secrète pour signer les tokens
-    public_key: '%env(resolve:JWT_PUBLIC_KEY)%' # Clé publique pour vérifier les tokens
-    pass_phrase: '%env(JWT_PASSPHRASE)%'
-    token_ttl: 3600 # Durée de vie du token principal en secondes
-services:
-    app.refresh_token_service:
-        class: App\Service\RefreshTokenService
-        arguments: ['@doctrine.orm.default_entity_manager']
