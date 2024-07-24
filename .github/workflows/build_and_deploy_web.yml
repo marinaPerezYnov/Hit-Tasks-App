@@ -37,10 +37,10 @@ jobs:
       name: github-pages
       url: ${{steps.deployment.outputs.page_url}}
     runs-on: ubuntu-latest
-    permissions:
-      pages: write
+    # permissions:
+      # pages: write
       # to deploy to Pages
-      id-token: write
+      # id-token: write
       # to verify the deployment originates from a source
     #Add a dependency to the build job
     needs: build
