@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Build web app
-        run: npm run deploy
+        run: npm deploy
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           TOKEN: ${{ secrets.TOKEN }}
