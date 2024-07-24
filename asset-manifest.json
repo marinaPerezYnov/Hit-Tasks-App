@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/marinaPerezYnov/Hit-Tasks-App/static/css/main.33f59c37.css",
+    "main.js": "/marinaPerezYnov/Hit-Tasks-App/static/js/main.0afe8984.js",
+    "static/media/logoHitTasks.png": "/marinaPerezYnov/Hit-Tasks-App/static/media/logoHitTasks.a2ef056f103124010701.png",
+    "index.html": "/marinaPerezYnov/Hit-Tasks-App/index.html",
+    "main.33f59c37.css.map": "/marinaPerezYnov/Hit-Tasks-App/static/css/main.33f59c37.css.map",
+    "main.0afe8984.js.map": "/marinaPerezYnov/Hit-Tasks-App/static/js/main.0afe8984.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.33f59c37.css",
+    "static/js/main.0afe8984.js"
+  ]
+}
