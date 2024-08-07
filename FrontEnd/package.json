@@ -25,8 +25,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "eject": "react-scripts eject",
-    "test": "react-scripts test  --coverage --watchAll=false",
-    "deploy": "gh-pages -t -d dist"
+    "test": "react-scripts test",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -51,5 +52,5 @@
     "gh-pages": "^6.1.1"
   },
   "private": false,
-  "homepage": "https://github.com/marinaPerezYnov/Hit-Tasks-App/"
+  "homepage": "https://marinaPerezYnov.github.io/Hit-Tasks-App/"
 }
