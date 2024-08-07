@@ -1,0 +1,59 @@
+version: '3.0'
+# version: '3.7'
+services:
+  # NGINX Service
+  web-nginx:
+    image: nginx:stable-alpine
+    # container_name: web-nginx-forum
+    working_dir: /usr/share/nginx/html
+    volumes:
+      #volume stockant les fichiers web du projet
+      - "./apiFolder:/usr/share/nginx/html:ro"
+      - "./.docker/nginx/log:/var/log/nginx"
+      - "./.docker/nginx/nginx.conf/:/etc/nginx/nginx.conf/:ro"
+    ports:
+    #local: container
+      - "8081:80"
+    # depends_on:
+    #   - db
+    # links:
+    # #lien vers le conteneur db
+    #   - db:db
+  # PHP Service
+  web-api-tasks-php-bloc:
+    #build: .docker/php
+    #container_name: web-forum-php
+    build:
+      context: .
+      dockerfile: ./.docker/php/Dockerfile
+    # container_name: web-forum-php-bloc
+    working_dir: /usr/share/nginx/html
+    # dns :
+    #   - 127.0.0.1
+    volumes:
+      - "./apiFolder:/usr/share/nginx/html"
+    command:
+      - /bin/sh
+      - -c
+      - |
+         composer update --prefer-dist --no-progress & php-fpm
+    #        pwd
+    #        make -C /usr/share/nginx/html/ start-local
+    #        cd /usr/share/nginx/html -- composer update --prefer-dist --no-progress  
+  database:
+    image: 'mariadb:10.5.12'
+    env_file:
+      - ./.docker/mariadb/.env.dev
+    ports:
+      - "3306:3306"
+  adminer:
+    image: adminer
+    #    restart: always
+    ports:
+      - 8080:8080
+
+volumes:
+  db_data: {}
+
+# Start containers with docker-compose up -d
+# Go into the php container with docker-compose exec php bash
