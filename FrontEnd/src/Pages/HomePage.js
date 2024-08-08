@@ -11,7 +11,8 @@ export const HomePage = () => {
       <div className="container">
         <ul className="list">
           <li className="detailObjectifs">
-            Keep all your tasks and projects in one place, accessible from any Internet-connected device.
+            Keep all your tasks and projects in one place, accessible from any
+            Internet-connected device.
             <hr className="divider" />
           </li>
           <li className="detailObjectifs">
@@ -19,7 +20,8 @@ export const HomePage = () => {
             <hr className="divider" />
           </li>
           <li className="detailObjectifs">
-            Keep an overview of your progress and adjust your priorities according to your needs.
+            Keep an overview of your progress and adjust your priorities
+            according to your needs.
             <hr className="divider" />
           </li>
         </ul>

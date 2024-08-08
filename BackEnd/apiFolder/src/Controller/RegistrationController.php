@@ -88,12 +88,13 @@ class RegistrationController extends AbstractController
         $userFindForTokenReceive = $this->doctrine->getRepository(User::class)->findOneBy(
             ['email' => $data['email']]
         );
+
         $token = $this->generateToken($userFindForTokenReceive);
 
         $userId = $userFindForTokenReceive->getId();
         $familyKey = $userFindForTokenReceive->getFamilyKey();
         $subscriptionKey = $userFindForTokenReceive->getSubscriptionKey();
-        // var_dump($userFindForTokenReceive);
+
         return new JsonResponse([
           'error' => $error,
           'lastUserName' => $lastUsername,

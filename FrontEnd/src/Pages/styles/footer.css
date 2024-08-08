@@ -1,0 +1,33 @@
+.PrivacyPolicy {
+    font-size: 1.3rem;
+    color: white;
+    font-weight: 700;
+    text-decoration: none;
+    margin: 0 1rem;
+}
+
+.containerPrivacy {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 15px;
+    background-color: whitesmoke;
+    text-align: left;
+    padding: 5%;
+    margin: 15px;
+}
+
+.containerPrivacy h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.containerPrivacy h3 {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.containerPrivacy ul {
+    list-style: disc;
+    padding-left: 15px;
+}
