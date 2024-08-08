@@ -21,6 +21,8 @@
 
 .title {
     color: white;
+    text-shadow: 3px 1px 2px rgba(0, 0, 0, 0.5);
+    font-size: xxx-large;
 }
 
 .tasks {
@@ -49,21 +51,20 @@
     .button {
         width: auto;
     }
-  }
-  
-  /* Media query pour les écrans de taille moyenne (tablettes) */
-  @media only screen and (min-width: 601px) and (max-width: 992px) {
-  }
-  
-  /* Media query pour les écrans de grande taille (desktop) */
-  @media only screen and (min-width: 993px) {
+}
+
+/* Media query pour les écrans de taille moyenne (tablettes) */
+@media only screen and (min-width: 601px) and (max-width: 992px) {}
+
+/* Media query pour les écrans de grande taille (desktop) */
+@media only screen and (min-width: 993px) {
     .button {
         width: 45%;
     }
-  }
+}
 
-  .css-i9fmh8-MuiBackdrop-root-MuiModal-backdrop {
+.css-i9fmh8-MuiBackdrop-root-MuiModal-backdrop {
     left: initial !important;
     position: inherit !important;
     background-color: white !important;
-  }
+}

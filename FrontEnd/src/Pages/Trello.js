@@ -7,59 +7,59 @@ import { COLUMN_NAMES } from "../Components/trello/Constants";
 import "./styles/trello.css";
 
 const saveTasks = (datas) => {
-    // Modifier pour enregistrer la tâche qui contient comme status COLUMN_NAMES.DONE alors enregistrer la tâche dans la table historic
-    const currentDate = new Date(datas.data.date);
-    const year = currentDate.getFullYear();
-    // Les mois sont indexés à partir de 0, donc ajoutez 1 pour obtenir le mois réel
-    const month = currentDate.getMonth() + 1;
-    
-    // Formattez la date au format YYYY-MM
-    // const formattedDate = `${year}-${month.toString().padStart(2, '0')}`;
-    const formattedDate = `${currentDate}`;
+  // Modifier pour enregistrer la tâche qui contient comme status COLUMN_NAMES.DONE alors enregistrer la tâche dans la table historic
+  const currentDate = new Date(datas.data.date);
+  const year = currentDate.getFullYear();
+  // Les mois sont indexés à partir de 0, donc ajoutez 1 pour obtenir le mois réel
+  const month = currentDate.getMonth() + 1;
 
-    fetch("http://localhost:8081/addHistoric", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + sessionStorage.getItem("token")
-      },
-      body: JSON.stringify({taskId: datas.data.id ,date: new Date(currentDate).toISOString(), valueTasksCompleted: datas.data.taskValue, userId: sessionStorage.getItem("userId") }),
-    })
+  // Formattez la date au format YYYY-MM
+  // const formattedDate = `${year}-${month.toString().padStart(2, '0')}`;
+  const formattedDate = `${currentDate}`;
+
+  fetch("http://localhost:8081/addHistoric", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + sessionStorage.getItem("token"),
+    },
+    body: JSON.stringify({
+      taskId: datas.data.id,
+      date: new Date(currentDate).toISOString(),
+      valueTasksCompleted: datas.data.taskValue,
+      userId: sessionStorage.getItem("userId"),
+    }),
+  })
     .then((response) => response.json())
     .catch((error) => console.log("error", error));
-  };
+};
 
-  // Fonction qui permettra d'enregistrer en base de données le nouveau status de la tâche : /updateStatusTasks
-  const updateStatusTasks = (id, status) => {
-    let newStatus;
-    if(status === COLUMN_NAMES.DO_IT)
-        newStatus = 0;
-    else if(status === COLUMN_NAMES.IN_PROGRESS)
-        newStatus = 1;
-    else if(status === COLUMN_NAMES.AWAITING_REVIEW)
-        newStatus = 2;
-    else if(status === COLUMN_NAMES.DONE)
-        newStatus = 3;
-    console.log("id  et status: ", id, status, newStatus);
-    fetch("http://localhost:8081/updateStatusTasks", {
-     method: "PUT",
-        headers: {
-         "Content-Type": "application/json",
-         "Authorization": "Bearer " + sessionStorage.getItem("token")
-        },
-        body: JSON.stringify({ id: id, status: newStatus }),
-    })
+// Fonction qui permettra d'enregistrer en base de données le nouveau status de la tâche : /updateStatusTasks
+const updateStatusTasks = (id, status) => {
+  let newStatus;
+  if (status === COLUMN_NAMES.DO_IT) newStatus = 0;
+  else if (status === COLUMN_NAMES.IN_PROGRESS) newStatus = 1;
+  else if (status === COLUMN_NAMES.AWAITING_REVIEW) newStatus = 2;
+  else if (status === COLUMN_NAMES.DONE) newStatus = 3;
+  console.log("id  et status: ", id, status, newStatus);
+  fetch("http://localhost:8081/updateStatusTasks", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + sessionStorage.getItem("token"),
+    },
+    body: JSON.stringify({ id: id, status: newStatus }),
+  })
     .then((response) => response.json())
     .then((data) => {
       console.log("data : ", data);
       console.log("newStatus : ", newStatus);
-        if(newStatus === 3) {
-            saveTasks(data);
-        }
+      if (newStatus === 3) {
+        saveTasks(data);
+      }
     })
     .catch((error) => console.log("error", error));
 };
-
 
 const MovableItem = ({
   name,
@@ -67,22 +67,27 @@ const MovableItem = ({
   id,
   currentColumnName,
   moveCardHandler,
-  setItems
+  setItems,
 }) => {
   const changeItemColumn = (currentItem, columnName) => {
-
     console.log("currentItem : ", currentItem);
     setItems((prevState) => {
       return prevState.map((e) => {
         console.log("element : ", e);
-        console.log("columnName : ", columnName !== currentItem.currentColumnName);
-        if(columnName !== currentItem.currentColumnName && e.id === currentItem.id) {
-          console.log("id : ", e.id)
-            updateStatusTasks(e.id, columnName);
+        console.log(
+          "columnName : ",
+          columnName !== currentItem.currentColumnName
+        );
+        if (
+          columnName !== currentItem.currentColumnName &&
+          e.id === currentItem.id
+        ) {
+          console.log("id : ", e.id);
+          updateStatusTasks(e.id, columnName);
         }
         return {
           ...e,
-          column: e.name === currentItem.name ? columnName : e.column
+          column: e.name === currentItem.name ? columnName : e.column,
         };
       });
     });
@@ -129,7 +134,7 @@ const MovableItem = ({
       // but it's good here for the sake of performance
       // to avoid expensive index searches.
       item.index = hoverIndex;
-    }
+    },
   });
 
   const [{ isDragging }, drag] = useDrag({
@@ -160,8 +165,8 @@ const MovableItem = ({
       }
     },
     collect: (monitor) => ({
-      isDragging: monitor.isDragging()
-    })
+      isDragging: monitor.isDragging(),
+    }),
   });
 
   const opacity = isDragging ? 0.4 : 1;
@@ -181,7 +186,7 @@ const Column = ({ children, className, title }) => {
     drop: () => ({ name: title }),
     collect: (monitor) => ({
       isOver: monitor.isOver(),
-      canDrop: monitor.canDrop()
+      canDrop: monitor.canDrop(),
     }),
     // Override monitor.canDrop() function
     canDrop: (item) => {
@@ -196,74 +201,80 @@ const Column = ({ children, className, title }) => {
           (title === IN_PROGRESS || title === DONE)) ||
         (currentColumnName === DONE && title === AWAITING_REVIEW)
       );
-    }
+    },
   });
-
-  const getBackgroundColor = () => {
-    if (isOver) {
-      if (canDrop) {
-        return "rgb(188,251,255)";
-      } else if (!canDrop) {
-        return "rgb(255,188,188)";
-      }
-    } else {
-      return "";
-    }
-  };
 
   return (
     <div
       ref={drop}
       className={className}
-      style={{ backgroundColor: getBackgroundColor() }}
+      style={{
+        height: "120px",
+        width: "20%",
+        backgroundColor: "#282c34eb",
+        color: "white",
+        border: "0",
+      }}
     >
-      <p>{title}</p>
+      <p
+        style={{
+          fontSize: "1.5rem",
+          margin: "auto",
+        }}
+      >
+        {title}
+      </p>
       {children}
     </div>
   );
 };
 
 export const Trello = () => {
-
-    // Modifier le contenu de const items, setItems pour récupérer les tâches qui se trouvent dans la base de données
-    // Modifier la table de Tasks pour y rajouter une valeur entre 0 et 3 pour définir l'emplacement de la tâche et la postionnée dans la bonne colonne
+  // Modifier le contenu de const items, setItems pour récupérer les tâches qui se trouvent dans la base de données
+  // Modifier la table de Tasks pour y rajouter une valeur entre 0 et 3 pour définir l'emplacement de la tâche et la postionnée dans la bonne colonne
 
   const [items, setItems] = useState([]);
 
   useEffect(() => {
     // requête pour récupérer les tâches
-    fetch(`http://localhost:8081/getAllTasks/${sessionStorage.getItem("userId")}&familyKey=${sessionStorage.getItem("familyKey")}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + sessionStorage.getItem("token")
+    fetch(
+      `http://localhost:8081/getAllTasks/${sessionStorage.getItem(
+        "userId"
+      )}&familyKey=${sessionStorage.getItem("familyKey")}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + sessionStorage.getItem("token"),
+        },
       }
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network error or server error: ' + response.status);
-      }
-      return response.json();
-    })
-    .then((data) => {
-        setItems(data.data[1].map((item, index) => {
-          console.log("item 1: ", item);
+    )
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network error or server error: " + response.status);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setItems(
+          data.data[1].map((item, index) => {
+            console.log("item 1: ", item);
             if (item.status === 0) {
-                return {id: item.id, name: item.name, column: DO_IT}
+              return { id: item.id, name: item.name, column: DO_IT };
             } else if (item.status === 1) {
-                return {id: item.id, name: item.name, column: IN_PROGRESS}
+              return { id: item.id, name: item.name, column: IN_PROGRESS };
             } else if (item.status === 2) {
-                return {id: item.id, name: item.name, column: AWAITING_REVIEW}
+              return { id: item.id, name: item.name, column: AWAITING_REVIEW };
             } else if (item.status === 3) {
-                return {id: item.id, name: item.name, column: DONE}
+              return { id: item.id, name: item.name, column: DONE };
             }
-        }));
-    })
-    .catch((error) => console.log("Error retrieving tasks", error));
+          })
+        );
+      })
+      .catch((error) => console.log("Error retrieving tasks", error));
   }, []);
 
   const moveCardHandler = (dragIndex, hoverIndex) => {
-
     const dragItem = items[dragIndex];
     if (dragItem) {
       setItems((prevState) => {
@@ -281,44 +292,63 @@ export const Trello = () => {
   };
 
   const returnItemsForColumn = (columnName) => {
-    if(items !== undefined) {
+    if (items !== undefined) {
       return items
-      .filter((item) => item.column === columnName)
-      .map((item, index) => (
-        <MovableItem
-          key={item.id}
-          name={item.name}
-          id={item.id}
-          currentColumnName={item.column}
-          setItems={setItems}
-          index={index}
-          moveCardHandler={moveCardHandler}
-        />
-      ));
+        .filter((item) => item.column === columnName)
+        .map((item, index) => (
+          <MovableItem
+            key={item.id}
+            name={item.name}
+            id={item.id}
+            currentColumnName={item.column}
+            setItems={setItems}
+            index={index}
+            moveCardHandler={moveCardHandler}
+          />
+        ));
     }
   };
 
   const { DO_IT, IN_PROGRESS, AWAITING_REVIEW, DONE } = COLUMN_NAMES;
 
   return (
-    <div className="container">
-      <DndProvider backend={HTML5Backend}>
-        <Column title={DO_IT} className="column do-it-column">
-          {returnItemsForColumn(DO_IT)}
-        </Column>
-        <Column title={IN_PROGRESS} className="column in-progress-column">
-          {returnItemsForColumn(IN_PROGRESS)}
-        </Column>
-        <Column
-          title={AWAITING_REVIEW}
-          className="column awaiting-review-column"
-        >
-          {returnItemsForColumn(AWAITING_REVIEW)}
-        </Column>
-        <Column title={DONE} className="column done-column">
-          {returnItemsForColumn(DONE)}
-        </Column>
-      </DndProvider>
+    <div
+      styles={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <h2
+        style={{
+          fontSize: "xxx-large",
+          color: "white",
+          textTransform: "uppercase",
+          textShadow: "3px 1px 2px rgba(0, 0, 0, 0.5)",
+        }}
+      >
+        Organisateur de temps
+      </h2>
+      <div className="container">
+        <DndProvider backend={HTML5Backend}>
+          <Column title={DO_IT} className="column do-it-column">
+            {returnItemsForColumn(DO_IT)}
+          </Column>
+          <Column title={IN_PROGRESS} className="column in-progress-column">
+            {returnItemsForColumn(IN_PROGRESS)}
+          </Column>
+          <Column
+            title={AWAITING_REVIEW}
+            className="column awaiting-review-column"
+          >
+            {returnItemsForColumn(AWAITING_REVIEW)}
+          </Column>
+          <Column title={DONE} className="column done-column">
+            {returnItemsForColumn(DONE)}
+          </Column>
+        </DndProvider>
+      </div>
     </div>
   );
 };
