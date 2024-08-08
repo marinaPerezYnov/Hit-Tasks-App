@@ -184,8 +184,8 @@ export const Calendar = ({
                 marginLeft: "20%",
                 width: "70%",
                 "&:hover": {
-                  backgroundColor: "white",
-                  color: "black",
+                  backgroundColor: "rgb(25 118 210)!important",
+                  color: "white",
                 },
               }}
               onClick={() => {
@@ -283,6 +283,10 @@ export const Calendar = ({
               marginTop: "5%",
               marginLeft: "20%",
               width: "70%",
+              "&:hover": {
+                backgroundColor: "rgb(25 118 210)!important",
+                color: "white",
+              },
             }}
             onClick={setATask}
           >
@@ -480,6 +484,10 @@ export const Calendar = ({
           sx={{
             backgroundColor: "black",
             color: "white",
+            "&:hover": {
+              backgroundColor: "rgb(25 118 210)!important",
+              color: "white",
+            },
           }}
         >
           Créez une nouvelle tâche

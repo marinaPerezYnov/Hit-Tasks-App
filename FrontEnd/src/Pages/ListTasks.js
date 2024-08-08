@@ -156,7 +156,7 @@ export const ListTasks = () => {
 
   return (
     <div>
-      <h3 className="title">ListTasks</h3>
+      <h3 className="title">Liste de tâches</h3>
       <Calendar
         setAddNewTask={setAddNewTask}
         listTasks={listTasks}

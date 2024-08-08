@@ -26,10 +26,10 @@ export default function Header() {
         {isAuth ? (
           <>
             <li>
-              <Link to="/">Home</Link>
+              <Link to="/">Accueil</Link>
             </li>
             <li>
-              <Link to="/listTasks">ListTasks</Link>
+              <Link to="/listTasks">Liste de tâches</Link>
             </li>
             <li>
               <Link to="/tasksOrganisators">Organisateur de temps</Link>
@@ -38,7 +38,7 @@ export default function Header() {
               <Link to="/history">Historique</Link>
             </li>
             <li>
-              <Link to="/accountSubscription">Subscribe</Link>
+              <Link to="/accountSubscription">Choisir son abonnement</Link>
             </li>
             {sessionStorage.getItem("subscriptionKey") === "2" && (
               <li>

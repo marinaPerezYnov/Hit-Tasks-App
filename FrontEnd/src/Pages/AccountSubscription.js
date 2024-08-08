@@ -99,8 +99,8 @@ export const AccountSubscription = () => {
       color: "wheat",
       fontSize: "unset",
       "&:hover": {
-        backgroundColor: "wheat",
-        color: "black",
+        backgroundColor: "rgb(25 118 210)!important",
+        color: "white",
       },
     },
   };
@@ -122,31 +122,56 @@ export const AccountSubscription = () => {
                 textShadow: "3px 1px 2px rgba(0, 0, 0, 0.5)",
               }}
             >
-              Choose your subscription
+              Choix d'abonnements disponibles
             </h2>
             <Box sx={styles.BlocsToSubscribe}>
               <Box sx={styles.Blocs}>
-                <h3>Classic subscription</h3>
+                <h3
+                  style={{
+                    fontSize: "x-large",
+                  }}
+                >
+                  Classic
+                </h3>
                 <p
                   style={{
                     fontSize: "1.2rem",
                   }}
                 >
-                  For 4,99€/month, you can create a classic account
+                  Pour 4,99€/Mois{" "}
+                  <hr
+                    style={{
+                      margin: "5%",
+                    }}
+                  />{" "}
+                  Vous aurez accès à toutes les fonctionnalités pour un compte
+                  individuel
                 </p>
                 <Button sx={styles.Button} onClick={classicSubscription}>
                   Subscribe
                 </Button>
               </Box>
               <Box sx={styles.Blocs}>
-                <h3>Family subscription</h3>
+                <h3
+                  style={{
+                    fontSize: "x-large",
+                  }}
+                >
+                  Premium
+                </h3>
                 <p
                   style={{
                     fontSize: "1.2rem",
                   }}
                 >
-                  For 6,99€/month, you can create a family account and add up to
-                  5 members
+                  Pour 6,99€/Mois{" "}
+                  <hr
+                    style={{
+                      margin: "5%",
+                    }}
+                  />{" "}
+                  Vous aurez accès à toutes les fonctionnalités synchronisées
+                  pour un groupe allant jusqu'à 5 personnes
                 </p>
                 <Button sx={styles.Button} onClick={familySubscription}>
                   Subscribe

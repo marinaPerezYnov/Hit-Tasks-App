@@ -11,17 +11,18 @@ export const HomePage = () => {
       <div className="container">
         <ul className="list">
           <li className="detailObjectifs">
-            Keep all your tasks and projects in one place, accessible from any
-            Internet-connected device.
+            Conservez toutes vos tâches et tous vos projets en un seul endroit,
+            accessible depuis n'importe quel appareil connecté à Internet.
             <hr className="divider" />
           </li>
           <li className="detailObjectifs">
-            Create weekly to-do lists and set achievable goals for each day.
+            Créez des listes hebdomadaires de choses à faire et fixez des
+            objectifs réalisables pour chaque jour.
             <hr className="divider" />
           </li>
           <li className="detailObjectifs">
-            Keep an overview of your progress and adjust your priorities
-            according to your needs.
+            Gardez une vue d'ensemble de vos progrès et ajustez vos priorités en
+            fonction de vos besoins.
             <hr className="divider" />
           </li>
         </ul>

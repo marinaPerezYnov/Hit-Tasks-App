@@ -198,7 +198,7 @@ export const History = () => {
 
   return (
     <div>
-      <h3 className="title">History</h3>
+      <h3 className="title">Historique</h3>
       <LocalizationProvider dateAdapter={AdapterDayjs} locale="fr">
         <DatePicker
           label={date.format("YYYY-MM")}
