@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "BackEnd",
+      "use": "@vercel/php"
+    },
+    {
+      "src": "FrontEnd",
+      "use": "@vercel/static-build"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "BackEnd/index.php"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "FrontEnd/$1"
+    }
+  ]
+}
