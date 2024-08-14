@@ -45,6 +45,48 @@ export const AccountSubscription = () => {
         .catch((error) => console.log("error", error));
     }
   }
+
+  function sendBuisnessKey(familyKey) {
+    if (familyKey !== null) {
+      fetch(`http://localhost:8081/checkFamilyKey`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + sessionStorage.getItem("token"),
+        },
+        body: JSON.stringify({ familyKey: Number(familyKey) }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status !== "Ce code existe déjà") {
+            fetch(
+              `http://localhost:8081/updateSubscriptionKey/${sessionStorage.getItem(
+                "userId"
+              )}`,
+              {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: "Bearer " + sessionStorage.getItem("token"),
+                },
+                body: JSON.stringify({
+                  subscriptionKey: 3,
+                  familyKey: familyKey,
+                }),
+              }
+            )
+              .then((data) => {
+                sessionStorage.setItem("subscriptionKey", 3);
+                sessionStorage.setItem("familyKey", familyKey);
+                setIsSubscribed(true);
+              })
+              .catch((error) => console.log("error", error));
+          }
+        })
+        .catch((error) => console.log("error", error));
+    }
+  }
+
   // nom de chemin de route /updateSubscriptionKey $data['subscriptionKey'] $data['userId']
   function classicSubscription() {
     // fetch(`http://localhost:8081/updateSubscriptionKey/${sessionStorage.getItem("userId")}&subscriptionKey=1`, {
@@ -73,6 +115,14 @@ export const AccountSubscription = () => {
     sendFamilyKey(randomNumber.toString().padStart(6, "0"));
   }
 
+  function buisnessSubscription() {
+    const randomNumber = Math.floor(Math.random() * 1000000);
+
+    console.log(randomNumber.toString().padStart(6, "0"));
+    // setFamilyKey(randomNumber.toString().padStart(6, '0'));
+    sendBuisnessKey(randomNumber.toString().padStart(6, "0"));
+  }
+
   function ChangeSuscribeType() {
     return setIsSubscribed(false);
   }
@@ -82,6 +132,7 @@ export const AccountSubscription = () => {
       justifyContent: "space-evenly",
       alignItems: "center",
       margin: "2%",
+      flexWrap: "wrap",
     },
     Blocs: {
       display: "flex",
@@ -131,7 +182,7 @@ export const AccountSubscription = () => {
                     fontSize: "x-large",
                   }}
                 >
-                  Classic
+                  Forfait Classic
                 </h3>
                 <p
                   style={{
@@ -157,7 +208,7 @@ export const AccountSubscription = () => {
                     fontSize: "x-large",
                   }}
                 >
-                  Premium
+                  Forfait Familial
                 </h3>
                 <p
                   style={{
@@ -174,6 +225,32 @@ export const AccountSubscription = () => {
                   pour un groupe allant jusqu'à 5 personnes
                 </p>
                 <Button sx={styles.Button} onClick={familySubscription}>
+                  Subscribe
+                </Button>
+              </Box>
+              <Box sx={styles.Blocs}>
+                <h3
+                  style={{
+                    fontSize: "x-large",
+                  }}
+                >
+                  Forfait Entreprise
+                </h3>
+                <p
+                  style={{
+                    fontSize: "1.2rem",
+                  }}
+                >
+                  Pour 6,99€/Mois{" "}
+                  <hr
+                    style={{
+                      margin: "5%",
+                    }}
+                  />{" "}
+                  Vous aurez accès à toutes les fonctionnalités synchronisées
+                  pour un groupe allant jusqu'à 5 personnes
+                </p>
+                <Button sx={styles.Button} onClick={buisnessSubscription}>
                   Subscribe
                 </Button>
               </Box>

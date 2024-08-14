@@ -8,7 +8,7 @@ import "./styles/home.css";
 export const HomePage = () => {
   return (
     <>
-      <div className="container">
+      <div className="containerHomePage">
         <ul className="list">
           <li className="detailObjectifs">
             Conservez toutes vos tâches et tous vos projets en un seul endroit,

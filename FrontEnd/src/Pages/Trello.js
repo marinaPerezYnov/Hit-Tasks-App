@@ -5,6 +5,10 @@ import { COLUMN_NAMES } from "../Components/trello/Constants";
 // import { tasks } from "./../Components/trello/tasks";
 
 import "./styles/trello.css";
+import { Grid } from "@mui/material";
+import { Switch } from "@mui/material";
+import { FormControlLabel } from "@mui/material";
+import { FormGroup } from "@mui/material";
 
 const saveTasks = (datas) => {
   // Modifier pour enregistrer la tâche qui contient comme status COLUMN_NAMES.DONE alors enregistrer la tâche dans la table historic
@@ -41,7 +45,7 @@ const updateStatusTasks = (id, status) => {
   else if (status === COLUMN_NAMES.IN_PROGRESS) newStatus = 1;
   else if (status === COLUMN_NAMES.AWAITING_REVIEW) newStatus = 2;
   else if (status === COLUMN_NAMES.DONE) newStatus = 3;
-  console.log("id  et status: ", id, status, newStatus);
+
   fetch("http://localhost:8081/updateStatusTasks", {
     method: "PUT",
     headers: {
@@ -52,8 +56,6 @@ const updateStatusTasks = (id, status) => {
   })
     .then((response) => response.json())
     .then((data) => {
-      console.log("data : ", data);
-      console.log("newStatus : ", newStatus);
       if (newStatus === 3) {
         saveTasks(data);
       }
@@ -70,24 +72,17 @@ const MovableItem = ({
   setItems,
 }) => {
   const changeItemColumn = (currentItem, columnName) => {
-    console.log("currentItem : ", currentItem);
     setItems((prevState) => {
       return prevState.map((e) => {
-        console.log("element : ", e);
-        console.log(
-          "columnName : ",
-          columnName !== currentItem.currentColumnName
-        );
         if (
           columnName !== currentItem.currentColumnName &&
           e.id === currentItem.id
         ) {
-          console.log("id : ", e.id);
           updateStatusTasks(e.id, columnName);
         }
         return {
           ...e,
-          column: e.name === currentItem.name ? columnName : e.column,
+          column: e.name === currentItem.name && e.id === currentItem.id ? columnName : e.column,
         };
       });
     });
@@ -209,17 +204,18 @@ const Column = ({ children, className, title }) => {
       ref={drop}
       className={className}
       style={{
-        height: "120px",
-        width: "20%",
+        minHeight: "120px",
+        maxWidth: "20%",
         backgroundColor: "#282c34eb",
-        color: "white",
+        color: "black",
         border: "0",
       }}
     >
       <p
         style={{
+          color: "white",
           fontSize: "1.5rem",
-          margin: "auto",
+          margin: "5% auto",
         }}
       >
         {title}
@@ -256,20 +252,28 @@ export const Trello = () => {
         return response.json();
       })
       .then((data) => {
-        setItems(
-          data.data[1].map((item, index) => {
-            console.log("item 1: ", item);
+
+        data.data.map(element => {
+          element.map(item => {
             if (item.status === 0) {
-              return { id: item.id, name: item.name, column: DO_IT };
+              setItems((prevState) => {
+                return [...prevState.concat({ id: item.id, userId: item.userId, name: item.name, column: DO_IT })];
+              });
             } else if (item.status === 1) {
-              return { id: item.id, name: item.name, column: IN_PROGRESS };
+              setItems((prevState) => {
+                return [...prevState.concat({ id: item.id, userId: item.userId, name: item.name, column: IN_PROGRESS })];
+              });
             } else if (item.status === 2) {
-              return { id: item.id, name: item.name, column: AWAITING_REVIEW };
+              setItems((prevState) => {
+                return [...prevState.concat({ id: item.id, userId: item.userId, name: item.name, column: AWAITING_REVIEW })];
+              });
             } else if (item.status === 3) {
-              return { id: item.id, name: item.name, column: DONE };
+              setItems((prevState) => {
+                return [...prevState.concat({ id: item.id, userId: item.userId, name: item.name, column: DONE })];
+              });
             }
-          })
-        );
+          });
+        });
       })
       .catch((error) => console.log("Error retrieving tasks", error));
   }, []);
@@ -282,10 +286,8 @@ export const Trello = () => {
 
         // remove item by "hoverIndex" and put "dragItem" instead
         const prevItem = coppiedStateArray.splice(hoverIndex, 1, dragItem);
-
         // remove item by "dragIndex" and put "prevItem" instead
         coppiedStateArray.splice(dragIndex, 1, prevItem[0]);
-
         return coppiedStateArray;
       });
     }
@@ -310,7 +312,19 @@ export const Trello = () => {
   };
 
   const { DO_IT, IN_PROGRESS, AWAITING_REVIEW, DONE } = COLUMN_NAMES;
-
+  useEffect(() => {
+    console.log("liste items :", items);
+  }, [items]);
+  const handleStatusChange = (event, index) => {
+    const updatedItems = [...items];
+    if(updatedItems[index].column === DONE)
+      return;
+    updatedItems[index].column = event.target.value;
+    setItems(updatedItems);
+  };
+  useEffect(() => {
+  console.log("items", items);
+  }, [items]);
   return (
     <div
       styles={{
@@ -330,25 +344,153 @@ export const Trello = () => {
       >
         Organisateur de temps
       </h2>
-      <div className="container">
-        <DndProvider backend={HTML5Backend}>
-          <Column title={DO_IT} className="column do-it-column">
-            {returnItemsForColumn(DO_IT)}
-          </Column>
-          <Column title={IN_PROGRESS} className="column in-progress-column">
-            {returnItemsForColumn(IN_PROGRESS)}
-          </Column>
-          <Column
-            title={AWAITING_REVIEW}
-            className="column awaiting-review-column"
-          >
-            {returnItemsForColumn(AWAITING_REVIEW)}
-          </Column>
-          <Column title={DONE} className="column done-column">
-            {returnItemsForColumn(DONE)}
-          </Column>
-        </DndProvider>
-      </div>
+      {sessionStorage.getItem("subscriptionKey") === "3" ? 
+      (
+        <>
+        <div className="containerMobile">
+              <div className="checkboxes" style={{
+                width: "80%",
+              }}>
+                { items !== undefined ? 
+                  items.map((item, index) => (
+                    <Grid sx={{
+                      border: "2px solid white",
+                      padding: "0 5%",
+                      margin: "5% auto",
+                      backgroundColor: "#282c34",
+                      color: "white",
+                    }}>
+                      <p key={item.id} style={{
+                        color: "white",
+                        fontSize: "1.5rem",
+                        margin: "5% auto",
+                        textAlign: "left",
+                      }}>{item.name}</p>
+                      <Grid sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignContent: "start",
+                        alignItems: "baseline",
+                        margin: "2%",
+                      }}>
+                        <div style={{
+                          display: "flex",
+                          alignItems: "center",
+                          width: "100%",
+                        }}>
+                          <input 
+                            type="checkbox" 
+                            id="do-it" 
+                            name="do-it" 
+                            value={DO_IT}
+                            checked={item.column === DO_IT}
+                            onChange={(e) => handleStatusChange(e, index)}
+                          />
+                          <label htmlFor="do-it" style={{
+                            marginLeft: "2%",
+                          }}>{DO_IT}</label>
+                        </div>
+                        <div style={{
+                          display: "flex",
+                          alignItems: "center",
+                          width: "100%",
+                        }}>
+                          <input
+                            type="checkbox"
+                            id="in-progress"
+                            name="in-progress"
+                            value={IN_PROGRESS}
+                            checked={item.column === IN_PROGRESS}
+                            onChange={(e) => handleStatusChange(e, index)}
+                          />
+                          <label htmlFor="in-progress" style={{
+                            marginLeft: "2%",
+                          }}>{IN_PROGRESS}</label>
+                        </div>
+                        <div style={{
+                          display: "flex",
+                          alignItems: "center",
+                          width: "100%",
+                        }}>
+                          <input
+                            type="checkbox"
+                            id="awaiting-review"
+                            name="awaiting-review"
+                            value={AWAITING_REVIEW}
+                            checked={item.column === AWAITING_REVIEW}
+                            onChange={(e) => handleStatusChange(e, index)}
+                          />
+                          <label htmlFor="awaiting-review" style={{
+                            marginLeft: "2%",
+                          }}>{AWAITING_REVIEW}</label>
+                        </div>
+                        <div style={{
+                          display: "flex",
+                          alignItems: "center",
+                          width: "100%",
+                        }}>
+                          <input 
+                            type="checkbox" 
+                            id="done" 
+                            name="done" 
+                            value={DONE} 
+                            checked={item.column === DONE} 
+                            onChange={(e) => handleStatusChange(e, index)}
+                          />
+                          <label htmlFor="done" style={{
+                            marginLeft: "2%",
+                          }}>{DONE}</label>
+                        </div>
+                      </Grid>
+                    </Grid>
+                  ))
+                  :
+                  null
+                }
+              </div>
+            </div>
+            <div className="container">
+              <DndProvider backend={HTML5Backend}>
+                <Column title={DO_IT} className="column do-it-column">
+                  {returnItemsForColumn(DO_IT)}
+                </Column>
+                <Column title={IN_PROGRESS} className="column in-progress-column">
+                  {returnItemsForColumn(IN_PROGRESS)}
+                </Column>
+                <Column
+                  title={AWAITING_REVIEW}
+                  className="column awaiting-review-column"
+                >
+                  {returnItemsForColumn(AWAITING_REVIEW)}
+                </Column>
+                <Column title={DONE} className="column done-column">
+                  {returnItemsForColumn(DONE)}
+                </Column>
+              </DndProvider>
+            </div>
+        </>
+      ):
+        <>
+        {/* intégrer une méthode switch "à faire" à terminé pour chacune des tâche */}
+        {items.map((item, index) => (
+          item.column !== "Terminée" &&
+            <>
+            <FormGroup sx={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              margin: "0 30%",
+              alignItems: "center",
+              textAlign: "right",
+            }}>
+              <label>{item.name}</label>
+              <FormControlLabel required control={<Switch />} label="Terminé" />
+            </FormGroup>
+          </>
+        ))}
+        </>
+      }
+
     </div>
   );
 };

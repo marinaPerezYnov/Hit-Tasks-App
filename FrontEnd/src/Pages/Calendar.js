@@ -132,9 +132,14 @@ export const Calendar = ({
       container
       columns={{ xs: 1, lg: 2 }}
       spacing={4}
-      alignItems="self-start"
-      justifyContent="center"
-      margin={10}
+      sx={{
+        display:"flex",
+        flexWrap: "wrap",
+        alignItems:"self-start",
+        justifyContent:"center",
+        margin: {xs:"auto", md:"10%", lg:"10%"},
+        maxWidth: {xs:"95%", md:"95%", lg:"95%"},
+      }}
     >
       {newTask === true ? (
         <Box
@@ -301,22 +306,23 @@ export const Calendar = ({
         <Grid
           item
           sx={{
-            maxWidth: "45%",
-            listZtyle: "none",
+            maxWidth: {xs:"95%", sm:"95%", md:"50%", lg:"45%"},
+            listStyle: "none",
             backgroundColor: "white",
             padding: "5% 2% 2% 2%",
-            width: "45%",
+            width: {xs:"95%", sm:"95%", md:"50%", lg:"45%"},
             textAlign: "left",
             borderTopLeftRadius: "15%",
             borderBottomRightRadius: "15%",
             borderTop: "10px solid rgb(93, 11, 11)",
             borderBottom: "7px solid rgb(48 107 131)",
-            fontSize: "1.2em",
+            fontSize: {xs:"1em", md:"1.2em", lg:"1.2em"},
+            margin: {xs:"auto", md:"auto", lg:"0"},
           }}
         >
           <Box
             sx={{
-              padding: "5%",
+              padding: {xs:"0", md:"5%", lg:"5%"},
             }}
           >
             <h4
@@ -349,7 +355,7 @@ export const Calendar = ({
                   paddingLeft: "2%",
                   marginBottom: "4%",
                   display: "flex",
-                  width: "65%",
+                  width: {xs:"100%", md:"100%", lg:"65%"},
                   alignItems: "center",
                 }}
               >
@@ -441,8 +447,8 @@ export const Calendar = ({
           alignItems="center"
           justifyContent="space-evenly"
           sx={{
-            marginTop: "0",
-            width: "50%",
+            marginTop: {xs:"5%", md:"0", lg:"0"},
+            width: {xs:"100%", md:"50%", lg:"50%"},
           }}
         >
           <Grid
@@ -451,7 +457,7 @@ export const Calendar = ({
               backgroundColor: "white",
               padding: "0 !important",
               boxShadow: "2px 2px 8px 0px #7a6108",
-              width: "45%",
+              width: {xs:"80%", md:"50%", lg:"45%"},
               minHeight: "350px",
             }}
           >

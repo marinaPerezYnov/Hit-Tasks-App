@@ -1,15 +1,16 @@
-.container {
+.container, .containerHomePage {
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 10% auto 5% auto;
+    flex-wrap: wrap;
 }
 
 .list {
     list-style: none;
     background-color: white;
     padding: 5% 2% 2% 2%;
-    width: 40%;
+    width: 45%;
     text-align: left;
     height: 275px;
     border-top-left-radius: 15%;
@@ -31,8 +32,9 @@
 
 /* Media query pour les écrans de petite taille (mobiles) */
 @media only screen and (max-width: 600px) {
-    .container {
+    .containerHomePage {
         flex-direction: column;
+        display: block;
     }
     .list {
         width: 80%;

@@ -168,7 +168,7 @@ export const ListTasks = () => {
         {currentTasks.length > 0 && currentTasks !== undefined ? (
           currentTasks.map((task, index) => (
             <>
-              <li key={task.id} className="button">
+              <li key={task.id} className="buttonTask">
                 <div
                   className="tasks"
                   style={{
