@@ -2,6 +2,7 @@
   "name": "hit-task",
   "version": "0.1.0",
   "dependencies": {
+    "@adobe/css-tools": "^4.4.0",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.15.9",
@@ -28,11 +29,13 @@
   },
   "scripts": {
     "start": "webpack-dev-server --history-api-fallback --open --hot --config webpack.dev.js",
-    "build": "react-scripts build",
+    "build": "set \"INLINE_RUNTIME_CHUNK=false\" && yarn clean-build && webpack --config webpack.prod.js",
+    "clean-build": "rimraf ./build && mkdir build",
     "eject": "react-scripts eject",
     "test": "react-scripts test",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build",
+    "postbuild": "node nonce.js"
   },
   "eslintConfig": {
     "extends": [

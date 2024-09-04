@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  client:
+    image: client-dev-i
+    build:
+      dockerfile: Dockerfile.dev
+    container_name: client-dev-c
+    env_file: .env
+    volumes:
+      # Assuming your project directory on the host is /path/to/your/project
+      # ./client:/usr/src/app
+      - /:/usr/src/app
+      - node_modules:/usr/src/app/node_modules/
+    ports:
+      - "3000:3000"
+    networks:
+    - HitTasksApp-front-network
+
+volumes:
+  node_modules:
+
+networks:
+  HitTasksApp-front-network:
+    name: HitTasksApp-network
+    external: true
