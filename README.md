@@ -6,13 +6,27 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 In the project directory, you can run:
 
-### `npm start`
+### Locally start mode dev
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+2. Execute `docker network create -d bridge HitTasksApp-network` to create network (for OWASP Docker Tests)
+3. Execute `./deploy.sh dev up` if you want to start the project.
+4. Execute `./deploy.sh dev stop` if you want to stop all containers
+5. Execute `./deploy.sh dev down` if you want to stop and remove all containers
+6. Execute `./deploy.sh dev volumes` if you want to stop and remove all containers and volumes
+7. Open your browser at follow URL [localhost](http://localhost:3000)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+
+### Locally building
+
+
+It is possible running the app building code and serving static code with Nginx
+
+
+1. Go in the [bin <directory>](bin) directory;
+2. Execute `./deploy.sh prod up` if you want to start the project.
+3. Execute `./deploy.sh prod stop` if you want to stop all containers
+4. Execute `./deploy.sh prod down` if you want to stop and remove all containers
+5. Execute `./deploy.sh prod volumes` if you want to stop and remove all containers and volumes
 
 ### `npm test`
 
