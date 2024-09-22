@@ -48,7 +48,6 @@ class RegistrationController extends AbstractController
             // $user = $this->doctrine->getRepository(User::class)->findOneBy(['family_key' => $data['familyKey']]);
             $user->setFamilyKey($data['familyKey']);
         }
-        $user->setWeekValue(0);
         $user->setSubscriptionKey(0);
 
         // Encoder le mot de passe
@@ -111,7 +110,6 @@ class RegistrationController extends AbstractController
         //TODO: Implémenter une fonction qui va permettre d'ajouter une valeur de tâches par semaine à un utilisateur
         $data = json_decode($request->getContent(), true);
         $valueTasksWeek = $this->doctrine->getRepository(User::class)->findOneBy(['id' => $data['userId']]);
-        $valueTasksWeek->setWeekValue($data['weekValue']);
         $entityManager = $this->doctrine->getManager();
         $entityManager->persist($valueTasksWeek);
         $entityManager->flush();
@@ -130,7 +128,6 @@ class RegistrationController extends AbstractController
 
         return $this->json(
             (object)[
-                'weekValue' => $valueTasksWeek->getWeekValue(),
                 'userId' => $valueTasksWeek->getId(),
             ]
         );

@@ -41,9 +41,9 @@ class TasksController extends AbstractController
         }
 
         $tasks->setName($data['name']);
-        $tasks->setTaskValue($data['taskValue']);
         $tasks->setUserId($data['userId']);
         $tasks->setTime($data['time']);
+        // Object of class DateTime could not be converted to string
         $tasks->setDate($dateTime);
         
         $entityManager = $this->doctrine->getManager();
@@ -56,17 +56,15 @@ class TasksController extends AbstractController
             ]
         );
     }
-
+    // http://localhost:8081/getAllTasks/1&familyKey=NaN
     #[Route(path: '/getAllTasks/{userId}&familyKey={familyKey}', name: 'app_get_all_tasks', methods: ['GET','POST'])]
     public function getAllTasks(Request $request, $userId, $familyKey): Response
     {
         //TODO: Implémenter une fonction qui va permettre de récupérer toutes les tasks de l'utilisateur avec l'ID $userId
         //Récupérer tous les id des utilisateurs qui ont la même familyKey
         $allTasks = [];
-
-        if($familyKey != null){
+        if($familyKey !== "null"){
             $allUserId = $this->doctrine->getRepository(User::class)->findBy(['familyKey' => $familyKey]);
-
             foreach ($allUserId as $userId) {
                 $allTasks[] = $this->doctrine->getRepository(Tasks::class)->findBy(['userId' => $userId]);
             }

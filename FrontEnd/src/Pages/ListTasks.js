@@ -30,7 +30,6 @@ export const ListTasks = () => {
   const [open, setOpen] = useState(false);
   const [addNewestTask, setAddNewTask] = useState({
     name: "",
-    taskValue: 0,
     userId: sessionStorage.getItem("userId"),
     date: "",
     time: "",
@@ -43,13 +42,22 @@ export const ListTasks = () => {
   const handleClose = () => setOpen(false);
 
   const navigate = useNavigate();
+  const [haveTask, setHaveTask] = useState(false);
+  
+  useEffect(() => {
+    if(currentTasks.length > 0 && currentTasks !== undefined) {
+      setHaveTask(true);
+    } else {
+      setHaveTask(false);
+    }
+  }, [currentTasks]);
 
   // Fonctionnalité de récupération des tâches est fonctionnelle
   const getTasks = () => {
     fetch(
       `http://localhost:8081/getAllTasks/${sessionStorage.getItem(
         "userId"
-      )}&familyKey=${sessionStorage.getItem("familyKey")}`,
+      )}&familyKey=${sessionStorage.getItem("familyKey")?sessionStorage.getItem("familyKey"):null}`,
       {
         method: "GET",
         headers: {
@@ -164,10 +172,18 @@ export const ListTasks = () => {
         currentTasks={currentTasks}
       />
       <div>{showLoader && <LinearBuffer />}</div>
-      <ul>
+      <ul 
+        style={{
+          position: haveTask ? "fixed" : "inherit",
+          bottom: haveTask ? "40%" : "inherit",
+          left: haveTask ? "25%" : "inherit",
+          border: haveTask ? "3px solid #ab7f40" : "inherit",
+          backgroundColor: haveTask ? "white" : "inherit",
+          width: haveTask ? "40%": "inherit",
+        }}
+      >
         {currentTasks.length > 0 && currentTasks !== undefined ? (
           currentTasks.map((task, index) => (
-            <>
               <li key={task.id} className="buttonTask">
                 <div
                   className="tasks"
@@ -177,14 +193,13 @@ export const ListTasks = () => {
                     color: task.isFinish ? "green" : "black",
                   }}
                 >
-                  <p className="description">{task.name}</p>
+                  <p className="description">{task.name} - {task.date}</p>
                   <div
                     style={{
                       display: "flex",
                       alignItems: "center",
                     }}
                   >
-                    <p className="percentValueList">{task.taskValue} %</p>
                     {Number(sessionStorage.getItem("userId")) ===
                       task.userId && (
                       <>
@@ -257,7 +272,6 @@ export const ListTasks = () => {
                   </div>
                 </div>
               </li>
-            </>
           ))
         ) : (
           <p> No tasks</p>

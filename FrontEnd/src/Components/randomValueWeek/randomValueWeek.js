@@ -21,7 +21,6 @@ export default function RandomValueWeek() {
         Authorization: "Bearer " + sessionStorage.getItem("token"),
       },
       body: JSON.stringify({
-        weekValue: Math.floor(Math.random() * 8 + 3) * 10,
         userId: sessionStorage.getItem("userId"),
       }),
     })

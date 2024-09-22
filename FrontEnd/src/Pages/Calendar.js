@@ -1,7 +1,7 @@
 /*
 Composant qui contiendra un calendrier de la bibliothèque MUI
 */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from 'react';
 import dayjs from "dayjs";
 import Grid from "@mui/material/Grid";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -32,6 +32,7 @@ export const Calendar = ({
   const [isClosedForm, setIsClosedForm] = useState(true);
   const [nameTask, setNameTask] = useState("");
   const [valueTask, setValueTask] = useState(0);
+
   // Une fonctionnalité pour planifier le jour de la semaine où l'on souhaite faire une activité et sélectionner l'heure de début et l'heure de fin
   function setATask() {
     fetch("http://localhost:8081/addTasks", {
@@ -42,7 +43,6 @@ export const Calendar = ({
       },
       body: JSON.stringify({
         name: nameTask,
-        taskValue: valueTask,
         userId: sessionStorage.getItem("userId"),
         date: new Date(selectedDate).toISOString(),
         time: `${selectedTime.hour()}:${selectedTime.minute()}`,
@@ -78,23 +78,24 @@ export const Calendar = ({
     const showDetailsListForDay = () => {
       const arrOfTasks = [];
       for (let i = 0; i < listTasks.length; i++) {
-        for (let j = 0; j < listTasks[i].length; j++) {
-          date = new Date(listTasks[i][j]?.date);
+        // for (let j = 0; j < listTasks[i].length; j++) {
+          // console.log("listTasks[i][j] : ", listTasks[i][j]);
+          date = new Date(listTasks[i]?.date);
+          // date = new Date(listTasks[i][j]?.date);
           if (
             date.getDate() === currentDay.getDate() &&
             date.getMonth() === currentDay.getMonth() &&
             date.getFullYear() === currentDay.getFullYear()
           ) {
-            arrOfTasks.push(listTasks[i][j]);
+            listTasks[i].date = `${date.toLocaleDateString('fr-FR', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit'
+          })} à ${listTasks[i].time}`;
+            arrOfTasks.push(listTasks[i]);
           }
-        }
-        // const date = new Date(listTasks[i][0]?.date);
-        // if(date.getDate() === currentDay.getDate()) {
-        //   console.log("liste : ", listTasks[i][0]);
-        //   arrOfTasks.push(listTasks[i][0]);
-        // }
       }
-      console.log("arrOfTasks : ", arrOfTasks);
+
       setCurrentTasks(arrOfTasks);
     };
 
@@ -162,21 +163,11 @@ export const Calendar = ({
             <TextField
               id="nameTask"
               sx={{
-                width: "70%",
+                width: "100%",
               }}
               label="Nom de la tâche"
               onChange={(e) => {
                 setNameTask(e.target.value);
-              }}
-            />
-            <TextField
-              id="valueTask"
-              sx={{
-                width: "20%",
-              }}
-              label="Valeur"
-              onChange={(e) => {
-                setValueTask(e.target.value);
               }}
             />
           </FormControl>
@@ -185,9 +176,8 @@ export const Calendar = ({
               sx={{
                 backgroundColor: "black",
                 color: "white",
-                marginTop: "5%",
-                marginLeft: "20%",
-                width: "70%",
+                marginTop: "7%",
+                width: "90%",
                 "&:hover": {
                   backgroundColor: "rgb(25 118 210)!important",
                   color: "white",
@@ -206,8 +196,7 @@ export const Calendar = ({
                 justifyContent: "right",
                 paddingRight: "5%",
                 paddingTop: "5%",
-                marginLeft: "20%",
-                width: "70%",
+                width: "90%",
               }}
               onClick={() => {
                 document.getElementById("calendar").style.display = "none";

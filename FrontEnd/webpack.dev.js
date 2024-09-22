@@ -21,7 +21,7 @@ module.exports = merge(config, {
       logging: "error",
       overlay: true,
     },
-    port: 3000,
+    port: 3030,
   },
   // Need for docker container reloading
   watchOptions: {

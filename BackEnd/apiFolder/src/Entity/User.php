@@ -34,9 +34,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: "string", length: 255)]
     private $password;
 
-    #[ORM\Column(type: "integer", nullable: true)]
-    private $weekValue;
-
     //clé d'abonnement 0 = compte seul, 1 = compte famille
     #[ORM\Column(type: "integer")]
     private $subscriptionKey;
@@ -65,18 +62,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(string $password): self
     {
         $this->password = $password;
-
-        return $this;
-    }
-
-    public function getWeekValue(): ?int
-    {
-        return $this->weekValue;
-    }
-
-    public function setWeekValue(?int $weekValue): self
-    {
-        $this->weekValue = $weekValue;
 
         return $this;
     }

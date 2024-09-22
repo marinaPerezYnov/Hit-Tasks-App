@@ -26,12 +26,6 @@ class Tasks
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $name;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    #[ORM\Column(type: 'integer', nullable: true)]
-    private $taskValue;
-
     #[ORM\Column(type:"datetime", nullable: true)]
     private $date;
 
@@ -67,18 +61,6 @@ class Tasks
     public function setName(?string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getTaskValue(): ?int
-    {
-        return $this->taskValue;
-    }
-
-    public function setTaskValue(?int $taskValue): self
-    {
-        $this->taskValue = $taskValue;
 
         return $this;
     }

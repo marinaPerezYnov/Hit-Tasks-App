@@ -52,11 +52,12 @@ export const Register = () => {
       })
         .then((response) => response.json())
         .then((data) => {
+          console.log("family key from register : ", familyKey);
           // J'enregistre le token dans le sessionStorage pour le conserver
           // Modifier son stockage pour une meilleure sécurité
           sessionStorage.setItem("token", data.token);
           sessionStorage.setItem("userId", data.userId);
-          sessionStorage.setItem("familyKey", familyKey);
+          sessionStorage.setItem("familyKey", familyKey === null ? null : familyKey);
           setShowLoader(false);
           // return navigate("/");
         })

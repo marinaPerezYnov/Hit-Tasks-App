@@ -30,7 +30,6 @@ const saveTasks = (datas) => {
     body: JSON.stringify({
       taskId: datas.data.id,
       date: new Date(currentDate).toISOString(),
-      valueTasksCompleted: datas.data.taskValue,
       userId: sessionStorage.getItem("userId"),
     }),
   })
@@ -236,7 +235,7 @@ export const Trello = () => {
     fetch(
       `http://localhost:8081/getAllTasks/${sessionStorage.getItem(
         "userId"
-      )}&familyKey=${sessionStorage.getItem("familyKey")}`,
+      )}&familyKey=${sessionStorage.getItem("familyKey")?sessionStorage.getItem("familyKey"):null}`,
       {
         method: "GET",
         headers: {
@@ -252,27 +251,24 @@ export const Trello = () => {
         return response.json();
       })
       .then((data) => {
-
         data.data.map(element => {
-          element.map(item => {
-            if (item.status === 0) {
+            if (element.status === 0) {
               setItems((prevState) => {
-                return [...prevState.concat({ id: item.id, userId: item.userId, name: item.name, column: DO_IT })];
+                return [...prevState.concat({ id: element.id, userId: element.userId, name: element.name, column: DO_IT })];
               });
-            } else if (item.status === 1) {
+            } else if (element.status === 1) {
               setItems((prevState) => {
-                return [...prevState.concat({ id: item.id, userId: item.userId, name: item.name, column: IN_PROGRESS })];
+                return [...prevState.concat({ id: element.id, userId: element.userId, name: element.name, column: IN_PROGRESS })];
               });
-            } else if (item.status === 2) {
+            } else if (element.status === 2) {
               setItems((prevState) => {
-                return [...prevState.concat({ id: item.id, userId: item.userId, name: item.name, column: AWAITING_REVIEW })];
+                return [...prevState.concat({ id: element.id, userId: element.userId, name: element.name, column: AWAITING_REVIEW })];
               });
-            } else if (item.status === 3) {
+            } else if (element.status === 3) {
               setItems((prevState) => {
-                return [...prevState.concat({ id: item.id, userId: item.userId, name: item.name, column: DONE })];
+                return [...prevState.concat({ id: element.id, userId: element.userId, name: element.name, column: DONE })];
               });
             }
-          });
         });
       })
       .catch((error) => console.log("Error retrieving tasks", error));
@@ -344,7 +340,7 @@ export const Trello = () => {
       >
         Organisateur de temps
       </h2>
-      {sessionStorage.getItem("subscriptionKey") === "3" ? 
+      {sessionStorage.getItem("subscriptionKey") && sessionStorage.getItem("subscriptionKey") === "3" ? 
       (
         <>
         <div className="containerMobile">
@@ -482,6 +478,8 @@ export const Trello = () => {
               margin: "0 30%",
               alignItems: "center",
               textAlign: "right",
+              backgroundColor: "white",
+              padding: "5px 30px",
             }}>
               <label>{item.name}</label>
               <FormControlLabel required control={<Switch />} label="Terminé" />

@@ -26,7 +26,7 @@ export const HomePage = () => {
             <hr className="divider" />
           </li>
         </ul>
-        <RandomValueWeek />
+        {/* <RandomValueWeek /> */}
       </div>
     </>
   );

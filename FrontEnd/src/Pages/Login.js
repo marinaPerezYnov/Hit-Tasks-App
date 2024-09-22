@@ -24,12 +24,12 @@ export const Login = () => {
     })
       .then((response) => response.json())
       .then((data) => {
-
+        console.log("family key from login : ", data.familyKey);
         // J'enregistre le token dans le sessionStorage pour le conserver
         // Modifier son stockage pour une meilleure sécurité
         sessionStorage.setItem("token", data.token);
         sessionStorage.setItem("userId", data.userId);
-        sessionStorage.setItem("familyKey", data.familyKey);
+        sessionStorage.setItem("familyKey", data.familyKey === null ? null : data.familyKey);
 
         setShowLoader(false);
         return navigate("/");
