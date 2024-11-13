@@ -4,11 +4,11 @@ FROM nginx
 # COPY --from=builder /app/build /usr/share/nginx/html
 
 # # Copier la configuration Nginx
-COPY nginx.conf /etc/nginx/nginx_local.conf
+# COPY nginx.conf /etc/nginx/nginx_local.conf
 
 # # Copier les fichiers de build de l'application React
 # COPY --from=builder /app/build /usr/share/nginx/html
-COPY --from=nginx:latest /etc/nginx/nginx.conf /nginx_local.conf
+# COPY --from=nginx:latest /etc/nginx/nginx.conf /nginx_local.conf
 # RUN rm -rf /root/.npm
 
 # # Donner les droits à nginx
@@ -35,7 +35,7 @@ COPY . .
 # # Construire l'application
 RUN npm run build
 
-# RUN npm start
+RUN npm start
 
 # Commande par défaut pour lancer Nginx au démarrage du conteneur
 # CMD ["/bin/hittasksapp"]

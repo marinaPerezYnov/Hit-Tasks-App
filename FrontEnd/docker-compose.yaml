@@ -12,7 +12,7 @@ services:
       - /:/usr/src/app
       - node_modules:/usr/src/app/node_modules/
     ports:
-      - "3000:3000"
+      - "3030:3030"
     networks:
     - HitTasksApp-front-network
 

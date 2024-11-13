@@ -11,6 +11,7 @@ import { FormControlLabel } from "@mui/material";
 import { FormGroup } from "@mui/material";
 
 const saveTasks = (datas) => {
+  console.log("datas : ", datas);
   // Modifier pour enregistrer la tâche qui contient comme status COLUMN_NAMES.DONE alors enregistrer la tâche dans la table historic
   const currentDate = new Date(datas.data.date);
   const year = currentDate.getFullYear();
@@ -482,7 +483,14 @@ export const Trello = () => {
               padding: "5px 30px",
             }}>
               <label>{item.name}</label>
-              <FormControlLabel required control={<Switch />} label="Terminé" />
+              <FormControlLabel 
+                required 
+                control={<Switch />} 
+                label="Terminé" 
+                onClick={()=>{
+                  saveTasks(item);
+                  console.log("click", item.id);
+                }} />
             </FormGroup>
           </>
         ))}

@@ -56,7 +56,7 @@ class TasksController extends AbstractController
             ]
         );
     }
-    // http://localhost:8081/getAllTasks/1&familyKey=NaN
+    // http://localhost:8081/getAllTasks/1&familyKey=NaN 
     #[Route(path: '/getAllTasks/{userId}&familyKey={familyKey}', name: 'app_get_all_tasks', methods: ['GET','POST'])]
     public function getAllTasks(Request $request, $userId, $familyKey): Response
     {
@@ -106,9 +106,10 @@ class TasksController extends AbstractController
 
         //on récupére le post qui a le même id que celui récupéré 
         $deleteTasks = $this->doctrine->getRepository(Tasks::class)->findOneBy(['id' => $data]);
-
         $em = $this->doctrine->getManager();
-        $em->remove($deleteHistoric);
+        if($deleteHistoric){
+            $em->remove($deleteHistoric);
+        }
         $em->remove($deleteTasks);
         $em->flush();
         return $this->json(

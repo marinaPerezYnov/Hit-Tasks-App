@@ -1,0 +1,1 @@
+2024/08/16 12:42:03 [error] 22#22: *1 upstream timed out (110: Operation timed out) while reading response header from upstream, client: 172.18.0.1, server: , request: "OPTIONS /userDetails/null HTTP/1.1", upstream: "fastcgi://172.18.0.2:9000", host: "localhost:8081", referrer: "http://localhost:3000/"

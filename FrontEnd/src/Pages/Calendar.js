@@ -21,18 +21,18 @@ const today = dayjs();
 const twoPM = dayjs().set("hour", 14).startOf("hour");
 
 export const Calendar = ({
-  setAddNewTask,
   listTasks,
   setCurrentTasks,
   currentTasks,
+  selectedDate,
+  setSelectedDate,
+  selectedTime,
+  setSelectedTime,
+  haveTask
 }) => {
-  const [selectedDate, setSelectedDate] = useState(today);
-  const [selectedTime, setSelectedTime] = useState(twoPM);
   const [newTask, setNewTask] = useState(false);
   const [isClosedForm, setIsClosedForm] = useState(true);
   const [nameTask, setNameTask] = useState("");
-  const [valueTask, setValueTask] = useState(0);
-
   // Une fonctionnalité pour planifier le jour de la semaine où l'on souhaite faire une activité et sélectionner l'heure de début et l'heure de fin
   function setATask() {
     fetch("http://localhost:8081/addTasks", {
@@ -77,26 +77,21 @@ export const Calendar = ({
 
     const showDetailsListForDay = () => {
       const arrOfTasks = [];
-      for (let i = 0; i < listTasks.length; i++) {
-        // for (let j = 0; j < listTasks[i].length; j++) {
-          // console.log("listTasks[i][j] : ", listTasks[i][j]);
-          date = new Date(listTasks[i]?.date);
-          // date = new Date(listTasks[i][j]?.date);
-          if (
-            date.getDate() === currentDay.getDate() &&
-            date.getMonth() === currentDay.getMonth() &&
-            date.getFullYear() === currentDay.getFullYear()
-          ) {
-            listTasks[i].date = `${date.toLocaleDateString('fr-FR', {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit'
-          })} à ${listTasks[i].time}`;
-            arrOfTasks.push(listTasks[i]);
-          }
-      }
-
-      setCurrentTasks(arrOfTasks);
+      console.log("listTasks : ", listTasks);
+      // Faire un recherche dans listTasks, si le tableau contient un objet qui a comme date la date actuelle, alors on l'ajoute à arrOfTasks
+      listTasks.filter((task) => {
+        const date = new Date(task.date);
+        if (
+          date.getDate() === currentDay.getDate() &&
+          date.getMonth() === currentDay.getMonth() &&
+          date.getFullYear() === currentDay.getFullYear()
+        ) {
+          arrOfTasks.push(task);
+        }
+        console.log("arrOfTasks : ", arrOfTasks);
+        return arrOfTasks;
+      });
+      return setCurrentTasks(arrOfTasks);
     };
 
     return (
@@ -138,8 +133,8 @@ export const Calendar = ({
         flexWrap: "wrap",
         alignItems:"self-start",
         justifyContent:"center",
-        margin: {xs:"auto", md:"10%", lg:"10%"},
-        maxWidth: {xs:"95%", md:"95%", lg:"95%"},
+        width: haveTask ? "50%" : "95%",
+        margin: haveTask ? "auto" : {xs:"auto", md:"10%", lg:"10%"},
       }}
     >
       {newTask === true ? (
@@ -150,8 +145,25 @@ export const Calendar = ({
             backgroundColor: "white",
             padding: "5%",
             borderRadius: "10px",
+            width: "50% !important",
           }}
         >
+          <Button
+          sx={{
+            marginBottom: "5%",
+            backgroundColor: "black",
+            color: "white",
+            "&:hover": {
+              backgroundColor: "rgb(25 118 210)!important",
+              color: "white",
+            },
+            position: "relative",
+            left: "50%"
+          }}
+          onClick={() => {
+            setNewTask(false);
+          }}
+          >Fermer</Button>
           <FormControl
             sx={{
               display: "flex",
@@ -216,7 +228,7 @@ export const Calendar = ({
               justifyContent="space-evenly"
               sx={{
                 margin: "5% auto",
-                width: "auto",
+                width: "100%",
                 display: "none",
               }}
             >
@@ -288,6 +300,7 @@ export const Calendar = ({
           </Button>
         </Box>
       ) : (
+        haveTask === false && (
         // Modifier le positionnement des blocs pour optimiser la visibilité ainsi que l'accessibilité
         // Uniformiser le visuel dans le cas où l'on souhaiterai créer une nouvelle tâche
         // Uniformiser le visuel dans le cas où l'on souhaiterai visualiser le descriptif du bloc d'explications
@@ -426,20 +439,45 @@ export const Calendar = ({
             </ul>
           </Box>
         </Grid>
-      )}
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <Grid
-          container
-          columns={{ xs: 1, lg: 2 }}
-          spacing={4}
-          id="calendarDetails"
-          alignItems="center"
-          justifyContent="space-evenly"
-          sx={{
-            marginTop: {xs:"5%", md:"0", lg:"0"},
-            width: {xs:"100%", md:"50%", lg:"50%"},
-          }}
-        >
+      ))}
+      {newTask === false && (
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <Grid
+            container
+            columns={{ xs: 1, lg: 2 }}
+            spacing={4}
+            id="calendarDetails"
+            alignItems="center"
+            justifyContent="space-evenly"
+            sx={{
+              marginTop: {xs:"5%", md:"0", lg:"0"},
+              width: haveTask ? "90%" : {xs:"100%", md:"50%", lg:"50%"},
+              flexDirection: "column",
+            }}
+          >
+          <Grid
+            item
+            sx={{
+              marginBottom: "5%",
+            }}
+          >
+            <h2>Organisez votre temps</h2>
+            <Button
+              onClick={() => {
+                setNewTask(true);
+              }}
+              sx={{
+                backgroundColor: "black",
+                color: "white",
+                "&:hover": {
+                  backgroundColor: "rgb(25 118 210)!important",
+                  color: "white",
+                },
+              }}
+            >
+              Créez une nouvelle tâche
+            </Button>
+          </Grid>
           <Grid
             item
             sx={{
@@ -462,32 +500,7 @@ export const Calendar = ({
           </Grid>
         </Grid>
       </LocalizationProvider>
-
-      <Grid
-        item
-        sx={{
-          position: "fixed",
-          left: "65%",
-          top: "80%",
-        }}
-      >
-        <h2>Organisez votre temps</h2>
-        <Button
-          onClick={() => {
-            setNewTask(true);
-          }}
-          sx={{
-            backgroundColor: "black",
-            color: "white",
-            "&:hover": {
-              backgroundColor: "rgb(25 118 210)!important",
-              color: "white",
-            },
-          }}
-        >
-          Créez une nouvelle tâche
-        </Button>
-      </Grid>
+      )}
     </Grid>
   );
 };
