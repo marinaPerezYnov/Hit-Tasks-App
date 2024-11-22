@@ -26,14 +26,20 @@ security:
                 provider: login
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
-
+        refresh:
+            pattern:  ^/token/refresh
+            stateless: true
         main:
             pattern: ^/
             stateless: true
             provider: login
             jwt: ~
-
+            entry_point: jwt
+            refresh_jwt:
+                check_path: /token/refresh
     access_control:
         - { path: ^/register, roles: PUBLIC_ACCESS }
         - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/token/refresh, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/docs, roles: PUBLIC_ACCESS }
         - { path: ^/, roles: ROLE_USER }
